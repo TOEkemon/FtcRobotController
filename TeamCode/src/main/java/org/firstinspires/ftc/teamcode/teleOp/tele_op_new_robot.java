@@ -31,7 +31,7 @@ public class tele_op_new_robot extends LinearOpMode {
   // Variables for kicker motor timing and state
   private boolean kickerActive = false;           // Flag to indicate if kicker is currently active
   private long kickerStartTime = 0;              // Time when kicker started
-  private static final double KICKER_POWER = -1.0; // Counter-clockwise at full speed (-1.0)
+  private static final double KICKER_POWER = 1.0; // Clockwise at full speed (1.0)
   private static final double KICKER_DURATION = 2.0; // Duration in seconds (2000 ms)
 
   // Variables for servo positions
@@ -200,11 +200,11 @@ public class tele_op_new_robot extends LinearOpMode {
       lastLeftTriggerPressed = leftTriggerPressed;
 
       // Handle kicker motor - activated with the left bumper held down
-      // Moves counter-clockwise at full speed for 2 seconds when activated
+      // Moves clockwise at full speed for 2 seconds when activated
       if (kicker_motor != null) {
           if (gamepad1.left_bumper && !leftBumperPressed) { // Use left bumper to activate kicker with debouncing
               // Start the kicker motor
-              kicker_motor.setPower(KICKER_POWER); // Counter-clockwise at full speed
+              kicker_motor.setPower(KICKER_POWER); // Clockwise at full speed
               kickerActive = true;
               kickerStartTime = System.currentTimeMillis(); // Record start time
               leftBumperPressed = true; // Mark that left bumper is pressed
