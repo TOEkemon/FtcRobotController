@@ -19,6 +19,8 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
+
 
 
 import java.util.ArrayList;
@@ -386,7 +388,7 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
            return normalizedY >= 0.5;
        }
    }
-   public static void driveToBall() {
+   public void driveToBall() {
        // Placeholder for driving logic to approach the detected ball
        double maxArea = 0; // Variable to track the largest contour area
        MatOfPoint largestContour = null; // Variable to store the largest contour found
