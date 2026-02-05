@@ -25,7 +25,8 @@ public class tele_op_new_robot extends LinearOpMode {
   private boolean yPressed = false;
   private boolean rightBumperPressed = false;
   private boolean leftBumperPressed = false;     // Track left bumper for clockwise kicker motor
-  private boolean rightBumperForCounterClockwise = false; // Track right bumper for counter-clockwise kicker motor
+  private boolean dpadLeftPressed = false;       // Track D-pad left for clockwise kicker motor
+  private boolean dpadRightPressed = false;      // Track D-pad right for counter-clockwise kicker motor
   private boolean lastRightTriggerPressed = false;
   private boolean lastLeftTriggerPressed = false;
 
@@ -201,29 +202,29 @@ public class tele_op_new_robot extends LinearOpMode {
       lastRightTriggerPressed = rightTriggerPressed;
       lastLeftTriggerPressed = leftTriggerPressed;
 
-      // Handle kicker motor - activated with different bumpers for different directions
-      // Left bumper moves clockwise, right bumper moves counter-clockwise
+      // Handle kicker motor - activated with D-pad for different directions
+      // D-pad left moves clockwise, D-pad right moves counter-clockwise
       if (kicker_motor != null) {
-          // Handle clockwise rotation (left bumper)
-          if (gamepad1.left_bumper && !leftBumperPressed) {
+          // Handle clockwise rotation (D-pad left)
+          if (gamepad1.dpad_left && !dpadLeftPressed) {
               kicker_motor.setPower(KICKER_POWER_CLOCKWISE); // Clockwise at full speed
               kickerActive = true;
               kickerStartTime = System.currentTimeMillis(); // Record start time
-              leftBumperPressed = true; // Mark that left bumper is pressed
+              dpadLeftPressed = true; // Mark that D-pad left is pressed
           }
-          // Handle counter-clockwise rotation (right bumper)
-          else if (gamepad1.right_bumper && !rightBumperForCounterClockwise) {
+          // Handle counter-clockwise rotation (D-pad right)
+          else if (gamepad1.dpad_right && !dpadRightPressed) {
               kicker_motor.setPower(KICKER_POWER_COUNTER_CLOCKWISE); // Counter-clockwise at full speed
               kickerActive = true;
               kickerStartTime = System.currentTimeMillis(); // Record start time
-              rightBumperForCounterClockwise = true; // Mark that right bumper is pressed
+              dpadRightPressed = true; // Mark that D-pad right is pressed
           }
           // Reset button states when released
-          else if (!gamepad1.left_bumper) {
-              leftBumperPressed = false; // Reset when left bumper is released
+          else if (!gamepad1.dpad_left) {
+              dpadLeftPressed = false; // Reset when D-pad left is released
           }
-          else if (!gamepad1.right_bumper) {
-              rightBumperForCounterClockwise = false; // Reset when right bumper is released
+          else if (!gamepad1.dpad_right) {
+              dpadRightPressed = false; // Reset when D-pad right is released
           }
 
           // Check if kicker is active and duration has elapsed
