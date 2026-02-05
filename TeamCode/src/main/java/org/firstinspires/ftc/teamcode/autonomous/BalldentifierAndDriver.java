@@ -1,6 +1,12 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 
@@ -17,6 +23,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 
 /**
@@ -81,8 +88,8 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
    private boolean drawContours = true;
 
 
-   private int camWidth = input.width();
-   private int camHeight = input.height();
+
+
 
 
    /**
