@@ -346,6 +346,7 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
 
        /**
         * Gets the position as a Point with normalized coordinates
+        *
         * @return Point with normalized X and Y coordinates
         */
        public Point getNormalizedPosition() {
@@ -355,6 +356,7 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
 
        /**
         * Checks if the ball is on the left side of the frame
+        *
         * @return true if the ball is in the left half of the frame
         */
        public boolean isOnLeftSide() {
@@ -364,6 +366,7 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
 
        /**
         * Checks if the ball is on the right side of the frame
+        *
         * @return true if the ball is in the right half of the frame
         */
        public boolean isOnRightSide() {
@@ -373,6 +376,7 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
 
        /**
         * Checks if the ball is in the top half of the frame
+        *
         * @return true if the ball is in the top half of the frame
         */
        public boolean isInTopHalf() {
@@ -382,82 +386,86 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
 
        /**
         * Checks if the ball is in the bottom half of the frame
+        *
         * @return true if the ball is in the bottom half of the frame
         */
        public boolean isInBottomHalf() {
            return normalizedY >= 0.5;
        }
    }
-   public void driveToBall() {
-       // Placeholder for driving logic to approach the detected ball
-       double maxArea = 0; // Variable to track the largest contour area
-       MatOfPoint largestContour = null; // Variable to store the largest contour found
-       // Iterate through all contours to find the one with the largest area (closest ball)
-       for (MatOfPoint contour : allContours) {
-           double area = Imgproc.contourArea(contour);
-           if (area > maxArea) {
-               maxArea = area;
-               largestContour = contour;
-           }
-       }
-       // If a valid contour is found, calculate its center position
-       if (largestContour != null) {
-           Moments moments = Imgproc.moments(largestContour);
-           if (moments.get_m00() != 0) {
-               double centerX = moments.get_m10() / moments.get_m00();
-               double  centerY = moments.get_m01() / moments.get_m00();
-           }
-       }
-       //find center of frame
-       Point frameCenter = new Point(camWidth / 2, camHeight / 2);
-       int camCenterX = camWidth / 2;
-       //align ball's x value with frame's x value
-       while (centerX != camCenterX) {
-           frontLeftMotor.setPower(0.2);
-           backLeftMotor.setPower(0.2);
-           frontRightMotor.setPower(-0.2);
-           backRightMotor.setPower(-0.2);
-           if (centerX == camCenterX) {
-               frontLeftMotor.setPower(0);
-               backLeftMotor.setPower(0);
-               frontRightMotor.setPower(0);
-               backRightMotor.setPower(0);
-               break;
-           }
-       }
-       // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
-       int intakeAreaRed = colorSensor.red();
-       int intakeAreaGreen = colorSensor.green();
-       int intakeAreaBlue = colorSensor.blue();
-       while (intakeAreaRed >=128 && intakeAreaGreen >=128 && intakeAreaBlue >=128 && intakeAreaRed <=150 && intakeAreaGreen <=150 && intakeAreaBlue <=150) {
-           intakeMotor.setPower(1);
-           frontLeftMotor.setPower(.5);
-           backLeftMotor.setPower(.5);
-           frontRightMotor.setPower(.5);
-           backRightMotor.setPower(.5);
-           if (intakeAreaRed <128 || intakeAreaGreen <128 || intakeAreaBlue <128 || intakeAreaRed >150 || intakeAreaGreen >150 || intakeAreaBlue >150) {
-               intakeMotor.setPower(0);
-               frontLeftMotor.setPower(0);
-               backLeftMotor.setPower(0);
-               frontRightMotor.setPower(0);
-               backRightMotor.setPower(0);
-               break;
-           }
-
-
-          
-       }
-
-
-
-
-
-
-          
-   }
 
 
 }
+public void driveToBall() {
+
+
+    // Placeholder for driving logic to approach the detected ball
+    double maxArea = 0; // Variable to track the largest contour area
+    MatOfPoint largestContour = null; // Variable to store the largest contour found
+    // Iterate through all contours to find the one with the largest area (closest ball)
+    for (MatOfPoint contour : allContours) {
+        double area = Imgproc.contourArea(contour);
+        if (area > maxArea) {
+            maxArea = area;
+            largestContour = contour;
+        }
+    }
+    // If a valid contour is found, calculate its center position
+    if (largestContour != null) {
+        Moments moments = Imgproc.moments(largestContour);
+        if (moments.get_m00() != 0) {
+            double centerX = moments.get_m10() / moments.get_m00();
+            double  centerY = moments.get_m01() / moments.get_m00();
+        }
+    }
+    //find center of frame
+    Point frameCenter = new Point(camWidth / 2, camHeight / 2);
+    int camCenterX = camWidth / 2;
+    //align ball's x value with frame's x value
+    while (centerX != camCenterX) {
+        frontLeftMotor.setPower(0.2);
+        backLeftMotor.setPower(0.2);
+        frontRightMotor.setPower(-0.2);
+        backRightMotor.setPower(-0.2);
+        if (centerX == camCenterX) {
+            frontLeftMotor.setPower(0);
+            backLeftMotor.setPower(0);
+            frontRightMotor.setPower(0);
+            backRightMotor.setPower(0);
+            break;
+        }
+    }
+    // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
+    int intakeAreaRed = colorSensor.red();
+    int intakeAreaGreen = colorSensor.green();
+    int intakeAreaBlue = colorSensor.blue();
+    while (intakeAreaRed >=128 && intakeAreaGreen >=128 && intakeAreaBlue >=128 && intakeAreaRed <=150 && intakeAreaGreen <=150 && intakeAreaBlue <=150) {
+        intakeMotor.setPower(1);
+        frontLeftMotor.setPower(.5);
+        backLeftMotor.setPower(.5);
+        frontRightMotor.setPower(.5);
+        backRightMotor.setPower(.5);
+        if (intakeAreaRed <128 || intakeAreaGreen <128 || intakeAreaBlue <128 || intakeAreaRed >150 || intakeAreaGreen >150 || intakeAreaBlue >150) {
+            intakeMotor.setPower(0);
+            frontLeftMotor.setPower(0);
+            backLeftMotor.setPower(0);
+            frontRightMotor.setPower(0);
+            backRightMotor.setPower(0);
+            break;
+        }
+
+
+
+    }
+
+
+
+
+
+
+
+}
+
 
 
 
