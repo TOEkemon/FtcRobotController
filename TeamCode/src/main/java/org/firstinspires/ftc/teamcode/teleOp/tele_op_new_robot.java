@@ -14,6 +14,7 @@ public class tele_op_new_robot extends LinearOpMode {
   private DcMotor back_right_motor;
   private DcMotor intakemotor;
   private DcMotor shooter_motor;
+  private DcMotor kicker_motor; // New kicker motor
   private Servo ball_push;
   private Servo wheel_rotation;
 
@@ -23,8 +24,15 @@ public class tele_op_new_robot extends LinearOpMode {
   private boolean bPressed = false;
   private boolean yPressed = false;
   private boolean rightBumperPressed = false;
+  private boolean leftBumperPressed = false;     // Track left bumper for kicker motor
   private boolean lastRightTriggerPressed = false;
   private boolean lastLeftTriggerPressed = false;
+
+  // Variables for kicker motor timing and state
+  private boolean kickerActive = false;           // Flag to indicate if kicker is currently active
+  private long kickerStartTime = 0;              // Time when kicker started
+  private static final double KICKER_POWER = -1.0; // Counter-clockwise at full speed (-1.0)
+  private static final double KICKER_DURATION = 2.0; // Duration in seconds (2000 ms)
 
   // Variables for servo positions
   private double currentWheelPosition = 0.0; // Start at minimum position
@@ -40,6 +48,7 @@ public class tele_op_new_robot extends LinearOpMode {
         back_right_motor = hardwareMap.get(DcMotor.class, "back_right_motor");
         intakemotor = hardwareMap.get(DcMotor.class, "intake_motor");
         shooter_motor = hardwareMap.get(DcMotor.class, "shooter_motor");
+        kicker_motor = hardwareMap.get(DcMotor.class, "kicker_motor"); // Initialize kicker motor
         ball_push = hardwareMap.get(Servo.class, "ball_push");
         wheel_rotation = hardwareMap.get(Servo.class, "wheel_rotation");
     } catch (Exception e) {
@@ -58,6 +67,7 @@ public class tele_op_new_robot extends LinearOpMode {
     if (back_right_motor != null) back_right_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     if (front_right_motor != null) front_right_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     if (shooter_motor != null) shooter_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    if (kicker_motor != null) kicker_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // Configure kicker motor brake mode
 
     // Initialize servos to safe positions
     if (ball_push != null) ball_push.setPosition(currentBallPushPosition);
@@ -189,6 +199,30 @@ public class tele_op_new_robot extends LinearOpMode {
       lastRightTriggerPressed = rightTriggerPressed;
       lastLeftTriggerPressed = leftTriggerPressed;
 
+      // Handle kicker motor - activated with the left bumper held down
+      // Moves counter-clockwise at full speed for 2 seconds when activated
+      if (kicker_motor != null) {
+          if (gamepad1.left_bumper && !leftBumperPressed) { // Use left bumper to activate kicker with debouncing
+              // Start the kicker motor
+              kicker_motor.setPower(KICKER_POWER); // Counter-clockwise at full speed
+              kickerActive = true;
+              kickerStartTime = System.currentTimeMillis(); // Record start time
+              leftBumperPressed = true; // Mark that left bumper is pressed
+          } else if (!gamepad1.left_bumper) {
+              leftBumperPressed = false; // Reset when left bumper is released
+          }
+
+          // Check if kicker is active and duration has elapsed
+          if (kickerActive) {
+              long currentTime = System.currentTimeMillis();
+              if ((currentTime - kickerStartTime) >= (KICKER_DURATION * 1000)) {
+                  // Duration has elapsed, stop the kicker motor
+                  kicker_motor.setPower(0.0);
+                  kickerActive = false;
+              }
+          }
+      }
+
       // Send telemetry data to driver station
       telemetry.addData("Vertical Power", "%.2f", verticalPower);
       telemetry.addData("Horizontal Power", "%.2f", horizontalPower);
@@ -205,6 +239,17 @@ public class tele_op_new_robot extends LinearOpMode {
       } else {
           telemetry.addData("Shooter Motor", "Not Found");
       }
+      if (kicker_motor != null) {
+          telemetry.addData("Kicker Motor Power", "%.2f", kicker_motor.getPower());
+          telemetry.addData("Kicker Active", kickerActive);
+          if (kickerActive) {
+              long currentTime = System.currentTimeMillis();
+              double elapsedTime = (currentTime - kickerStartTime) / 1000.0; // Convert to seconds
+              telemetry.addData("Kicker Elapsed Time", "%.2f", elapsedTime);
+          }
+      } else {
+          telemetry.addData("Kicker Motor", "Not Found");
+      }
       telemetry.update();
     }
 
@@ -215,6 +260,7 @@ public class tele_op_new_robot extends LinearOpMode {
     if (back_right_motor != null) back_right_motor.setPower(0);
     if (intakemotor != null) intakemotor.setPower(0);
     if (shooter_motor != null) shooter_motor.setPower(0);
+    if (kicker_motor != null) kicker_motor.setPower(0); // Stop kicker motor on shutdown
     // Ensure ball push servo returns to safe position
     if (ball_push != null) ball_push.setPosition(1.0);
   }
