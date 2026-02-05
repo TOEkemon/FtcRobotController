@@ -24,14 +24,16 @@ public class tele_op_new_robot extends LinearOpMode {
   private boolean bPressed = false;
   private boolean yPressed = false;
   private boolean rightBumperPressed = false;
-  private boolean leftBumperPressed = false;     // Track left bumper for kicker motor
+  private boolean leftBumperPressed = false;     // Track left bumper for clockwise kicker motor
+  private boolean rightBumperForCounterClockwise = false; // Track right bumper for counter-clockwise kicker motor
   private boolean lastRightTriggerPressed = false;
   private boolean lastLeftTriggerPressed = false;
 
   // Variables for kicker motor timing and state
   private boolean kickerActive = false;           // Flag to indicate if kicker is currently active
   private long kickerStartTime = 0;              // Time when kicker started
-  private static final double KICKER_POWER = 1.0; // Clockwise at full speed (1.0)
+  private static final double KICKER_POWER_CLOCKWISE = 1.0; // Clockwise at full speed (1.0)
+  private static final double KICKER_POWER_COUNTER_CLOCKWISE = -1.0; // Counter-clockwise at full speed (-1.0)
   private static final double KICKER_DURATION = 2.0; // Duration in seconds (2000 ms)
 
   // Variables for servo positions
@@ -199,17 +201,29 @@ public class tele_op_new_robot extends LinearOpMode {
       lastRightTriggerPressed = rightTriggerPressed;
       lastLeftTriggerPressed = leftTriggerPressed;
 
-      // Handle kicker motor - activated with the left bumper held down
-      // Moves clockwise at full speed for 2 seconds when activated
+      // Handle kicker motor - activated with different bumpers for different directions
+      // Left bumper moves clockwise, right bumper moves counter-clockwise
       if (kicker_motor != null) {
-          if (gamepad1.left_bumper && !leftBumperPressed) { // Use left bumper to activate kicker with debouncing
-              // Start the kicker motor
-              kicker_motor.setPower(KICKER_POWER); // Clockwise at full speed
+          // Handle clockwise rotation (left bumper)
+          if (gamepad1.left_bumper && !leftBumperPressed) {
+              kicker_motor.setPower(KICKER_POWER_CLOCKWISE); // Clockwise at full speed
               kickerActive = true;
               kickerStartTime = System.currentTimeMillis(); // Record start time
               leftBumperPressed = true; // Mark that left bumper is pressed
-          } else if (!gamepad1.left_bumper) {
+          }
+          // Handle counter-clockwise rotation (right bumper)
+          else if (gamepad1.right_bumper && !rightBumperForCounterClockwise) {
+              kicker_motor.setPower(KICKER_POWER_COUNTER_CLOCKWISE); // Counter-clockwise at full speed
+              kickerActive = true;
+              kickerStartTime = System.currentTimeMillis(); // Record start time
+              rightBumperForCounterClockwise = true; // Mark that right bumper is pressed
+          }
+          // Reset button states when released
+          else if (!gamepad1.left_bumper) {
               leftBumperPressed = false; // Reset when left bumper is released
+          }
+          else if (!gamepad1.right_bumper) {
+              rightBumperForCounterClockwise = false; // Reset when right bumper is released
           }
 
           // Check if kicker is active and duration has elapsed
@@ -246,6 +260,13 @@ public class tele_op_new_robot extends LinearOpMode {
               long currentTime = System.currentTimeMillis();
               double elapsedTime = (currentTime - kickerStartTime) / 1000.0; // Convert to seconds
               telemetry.addData("Kicker Elapsed Time", "%.2f", elapsedTime);
+
+              // Indicate which direction the kicker is rotating
+              if (kicker_motor.getPower() > 0) {
+                  telemetry.addData("Kicker Direction", "Clockwise");
+              } else if (kicker_motor.getPower() < 0) {
+                  telemetry.addData("Kicker Direction", "Counter-Clockwise");
+              }
           }
       } else {
           telemetry.addData("Kicker Motor", "Not Found");
