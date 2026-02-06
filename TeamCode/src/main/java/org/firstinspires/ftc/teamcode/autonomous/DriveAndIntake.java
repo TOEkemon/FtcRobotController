@@ -43,15 +43,27 @@ public class DriveAndIntake {
     // Placeholder for driving logic to approach the detected ball
     double maxArea = 0; // Variable to track the largest contour area
 
+    int camHeight;
+    int camWidth;
+
 
     // contour is a MatOfPoint
+
+    // Assuming you have initialized the camera and pipeline
+    BalldentifierAndDriver pipeline = new BalldentifierAndDriver();
+
+    //need to initialize pipeline for this to work
+
+    camWidth = pipeline.getFrameWidth();
+    camHeight = pipeline.getFrameHeight();
+
 
 
     public void driveToBall(List<MatOfPoint> allContours, int camWidth, int camHeight) {
 
+
         double centerX = 0;
         double centerY = 0;
-
 
         MatOfPoint largestContour = null; // Variable to store the largest contour found
         // Iterate through all contours to find the one with the largest area (closest ball)

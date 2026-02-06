@@ -17,6 +17,8 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 
+
+
 /**
  * Main autonomous class implementing the state machine for the FTC robot.
  * The robot performs the following sequence:
@@ -36,6 +38,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
  */
 @Autonomous(name = "DECODE Autonomous", group = "Autonomous")
 public class DecodeAutonomous extends LinearOpMode {
+
+
+
 
     // Enum for autonomous states - defines the sequence of operations
     enum AutonomousState {

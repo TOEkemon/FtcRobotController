@@ -90,6 +90,12 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
    private boolean drawContours = true;
 
 
+    int camHeight;
+    int camWidth;
+
+
+
+
 
 
 
@@ -99,9 +105,19 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
     * @param inputMat The input camera frame
     * @return The processed frame with overlays (contours, annotations)
     */
+
+
    @Override
    public Mat processFrame(Mat inputMat) {
        // Clone the input to avoid modifying the original
+
+        camWidth = inputMat.width();
+        camHeight = inputMat.height();
+
+
+
+
+
        inputMat.copyTo(contoursOnFrameMat);
 
 
@@ -185,6 +201,14 @@ public class BalldentifierAndDriver extends OpenCvPipeline {
 
        return contoursOnFrameMat;
    }
+
+   public int getFrameWidth() {
+       return camWidth;
+   }
+
+    public int getFrameHeight() {
+        return camHeight;
+    }
 
 
    /**
