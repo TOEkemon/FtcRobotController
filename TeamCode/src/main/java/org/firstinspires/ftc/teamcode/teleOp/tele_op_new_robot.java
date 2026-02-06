@@ -43,6 +43,7 @@ public class tele_op_new_robot extends LinearOpMode {
   // Variables for kicker motor timing
   private boolean kickerMoving = false; // Is kicker currently moving
   private long kickerMoveStartTime = 0; // Time when kicker started moving
+  private int kickerPhase = 0; // Phase: 0 = not moving, 1 = positive movement, 2 = negative movement
   private double kickerTargetPower = 0.0; // Target power for current movement
 
   // Constants for gripper servo positions
@@ -233,9 +234,18 @@ public class tele_op_new_robot extends LinearOpMode {
       // Handle kicker motor - incremental stepper with D-pad
       // D-pad left moves kicker 0.15 units in positive direction
       // D-pad right moves kicker 0.15 units in negative direction
+      // D-pad down triggers two-phase movement (out and back)
       
-      // Check if we need to start a new movement
-      if (kicker_motor != null && !kickerMoving) {
+      // Check if we need to start a new movement - prioritize two-phase movement (D-pad down)
+      if (kicker_motor != null && !kickerMoving && gamepad1.dpad_down) {
+          // Start the two-phase movement sequence (out and back)
+          kickerPhase = 1; // Start with positive movement
+          kicker_motor.setPower(KICKER_POWER); // Positive power for first phase
+          kickerMoving = true;
+          kickerMoveStartTime = System.currentTimeMillis();
+      }
+      // Check if we need to start a new movement - incremental stepper (D-pad left/right)
+      else if (kicker_motor != null && !kickerMoving) {
           // Handle clockwise increment (D-pad left)
           if (gamepad1.dpad_left && !dpadLeftPressed) {
               // Move kicker position positively by increment
@@ -250,7 +260,7 @@ public class tele_op_new_robot extends LinearOpMode {
               kickerMoving = true;
               kickerMoveStartTime = System.currentTimeMillis();
               dpadLeftPressed = true; // Mark that D-pad left is pressed
-          } 
+          }
           // Handle counter-clockwise increment (D-pad right)
           else if (gamepad1.dpad_right && !dpadRightPressed) {
               // Move kicker position negatively by increment
@@ -271,9 +281,29 @@ public class tele_op_new_robot extends LinearOpMode {
       else if (kickerMoving) {
           long currentTime = System.currentTimeMillis();
           if ((currentTime - kickerMoveStartTime) >= KICKER_MOVE_DURATION_MS) {
-              // Movement duration has elapsed, stop the motor
-              kicker_motor.setPower(0.0);
-              kickerMoving = false;
+              // Check if this is the two-phase movement (D-pad down)
+              if (kickerPhase == 1) {
+                  // First phase (positive movement) completed, start second phase (negative movement)
+                  kickerPhase = 2;
+                  kicker_motor.setPower(-KICKER_POWER); // Negative power for return movement
+                  kickerMoveStartTime = System.currentTimeMillis();
+              } else if (kickerPhase == 2) {
+                  // Second phase (negative movement) completed, stop motor and reset
+                  kicker_motor.setPower(0.0);
+                  kickerMoving = false;
+                  kickerPhase = 0; // Reset to initial state
+              } else {
+                  // Regular incremental stepper movement completed
+                  kicker_motor.setPower(0.0);
+                  kickerMoving = false;
+                  
+                  // Reset the appropriate button state
+                  if (dpadLeftPressed) {
+                      dpadLeftPressed = false;
+                  } else if (dpadRightPressed) {
+                      dpadRightPressed = false;
+                  }
+              }
           }
       }
       
