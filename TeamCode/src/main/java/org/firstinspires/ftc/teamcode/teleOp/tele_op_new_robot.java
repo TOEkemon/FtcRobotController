@@ -158,7 +158,7 @@ public class tele_op_new_robot extends LinearOpMode {
       if (wheel_rotation != null) {
           if (gamepad1.b && !bPressed) {
               // Move servo 1/3 of the way toward one end (120 degrees worth of movement)
-              currentWheelPosition += 0.333; // Approximately 1/3 of the servo range
+              currentWheelPosition += 0.14; // Approximately 1/3 of the servo range
               if (currentWheelPosition > 1.0) currentWheelPosition = 1.0;
               wheel_rotation.setPosition(currentWheelPosition);
               bPressed = true;
@@ -168,7 +168,7 @@ public class tele_op_new_robot extends LinearOpMode {
 
           if (gamepad1.y && !yPressed) {
               // Move servo 1/3 of the way toward the other end (120 degrees worth of movement)
-              currentWheelPosition -= 0.333; // Approximately 1/3 of the servo range
+              currentWheelPosition -= 0.14; // Approximately 1/3 of the servo range
               if (currentWheelPosition < 0.0) currentWheelPosition = 0.0;
               wheel_rotation.setPosition(currentWheelPosition);
               yPressed = true;
