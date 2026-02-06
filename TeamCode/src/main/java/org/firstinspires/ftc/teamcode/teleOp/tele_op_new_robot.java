@@ -109,10 +109,10 @@ public class tele_op_new_robot extends LinearOpMode {
       if (Math.abs(pivot) < 0.1) pivot = 0;
 
       // Calculate motor powers for Mecanum drive
-      double frontLeftPower = pivot + verticalPower + horizontalPower;
-      double rearLeftPower = pivot + verticalPower - horizontalPower;
-      double frontRightPower = -pivot + verticalPower - horizontalPower;
-      double rearRightPower = -pivot + verticalPower + horizontalPower;
+      double frontLeftPower = pivot + verticalPower - horizontalPower;
+      double rearLeftPower = pivot + verticalPower + horizontalPower;
+      double frontRightPower = -pivot + verticalPower + horizontalPower;
+      double rearRightPower = -pivot + verticalPower - horizontalPower;
 
       // Find the largest power value to normalize if any motor exceeds 1.0
       double maxPower = Math.max(Math.abs(frontLeftPower), Math.abs(rearLeftPower));
