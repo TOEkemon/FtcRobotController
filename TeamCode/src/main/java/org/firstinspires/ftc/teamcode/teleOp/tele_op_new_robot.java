@@ -32,12 +32,18 @@ public class tele_op_new_robot extends LinearOpMode {
   private boolean lastRightTriggerPressed = false;
   private boolean lastLeftTriggerPressed = false;
 
-  // Variables for kicker motor timing and state
-  private boolean kickerActive = false;           // Flag to indicate if kicker is currently active
-  private long kickerStartTime = 0;              // Time when kicker started
-  private static final double KICKER_POWER_CLOCKWISE = 1.0; // Clockwise at full speed (1.0)
-  private static final double KICKER_POWER_COUNTER_CLOCKWISE = -1.0; // Counter-clockwise at full speed (-1.0)
-  private static final double KICKER_DURATION = 0.15; // Duration in seconds (150 ms)
+  // Variables for kicker motor position control
+  private static final double KICKER_INCREMENT = 0.15; // Amount to move per button press
+  private static final double KICKER_POWER = 0.8; // Power level for kicker movement
+  private static final long KICKER_MOVE_DURATION_MS = 150; // Duration to run motor for each increment (0.15 sec)
+  private double kickerPosition = 0.0; // Current position of kicker
+  private static final double MAX_KICKER_POSITION = 1.0; // Maximum position limit
+  private static final double MIN_KICKER_POSITION = -1.0; // Minimum position limit
+  
+  // Variables for kicker motor timing
+  private boolean kickerMoving = false; // Is kicker currently moving
+  private long kickerMoveStartTime = 0; // Time when kicker started moving
+  private double kickerTargetPower = 0.0; // Target power for current movement
 
   // Constants for gripper servo positions
   private static final double GRIP_SERVO_LEFT_OPEN = 0.0;    // Left gripper servo open position
@@ -224,41 +230,56 @@ public class tele_op_new_robot extends LinearOpMode {
       lastRightTriggerPressed = rightTriggerPressed;
       lastLeftTriggerPressed = leftTriggerPressed;
 
-      // Handle kicker motor - activated with D-pad for different directions
-      // D-pad left moves clockwise, D-pad right moves counter-clockwise
-      if (kicker_motor != null) {
-          // Handle clockwise rotation (D-pad left)
+      // Handle kicker motor - incremental stepper with D-pad
+      // D-pad left moves kicker 0.15 units in positive direction
+      // D-pad right moves kicker 0.15 units in negative direction
+      
+      // Check if we need to start a new movement
+      if (kicker_motor != null && !kickerMoving) {
+          // Handle clockwise increment (D-pad left)
           if (gamepad1.dpad_left && !dpadLeftPressed) {
-              kicker_motor.setPower(KICKER_POWER_CLOCKWISE); // Clockwise at full speed
-              kickerActive = true;
-              kickerStartTime = System.currentTimeMillis(); // Record start time
+              // Move kicker position positively by increment
+              kickerPosition += KICKER_INCREMENT;
+              // Limit to maximum position
+              if (kickerPosition > MAX_KICKER_POSITION) {
+                  kickerPosition = MAX_KICKER_POSITION;
+              }
+              // Start motor movement
+              kickerTargetPower = KICKER_POWER;
+              kicker_motor.setPower(kickerTargetPower);
+              kickerMoving = true;
+              kickerMoveStartTime = System.currentTimeMillis();
               dpadLeftPressed = true; // Mark that D-pad left is pressed
-          }
-          // Handle counter-clockwise rotation (D-pad right)
+          } 
+          // Handle counter-clockwise increment (D-pad right)
           else if (gamepad1.dpad_right && !dpadRightPressed) {
-              kicker_motor.setPower(KICKER_POWER_COUNTER_CLOCKWISE); // Counter-clockwise at full speed
-              kickerActive = true;
-              kickerStartTime = System.currentTimeMillis(); // Record start time
+              // Move kicker position negatively by increment
+              kickerPosition -= KICKER_INCREMENT;
+              // Limit to minimum position
+              if (kickerPosition < MIN_KICKER_POSITION) {
+                  kickerPosition = MIN_KICKER_POSITION;
+              }
+              // Start motor movement
+              kickerTargetPower = -KICKER_POWER; // Negative power for reverse direction
+              kicker_motor.setPower(kickerTargetPower);
+              kickerMoving = true;
+              kickerMoveStartTime = System.currentTimeMillis();
               dpadRightPressed = true; // Mark that D-pad right is pressed
           }
-          // Reset button states when released
-          else if (!gamepad1.dpad_left) {
-              dpadLeftPressed = false; // Reset when D-pad left is released
-          }
-          else if (!gamepad1.dpad_right) {
-              dpadRightPressed = false; // Reset when D-pad right is released
-          }
-
-          // Check if kicker is active and duration has elapsed
-          if (kickerActive) {
-              long currentTime = System.currentTimeMillis();
-              if ((currentTime - kickerStartTime) >= (KICKER_DURATION * 1000)) {
-                  // Duration has elapsed, stop the kicker motor
-                  kicker_motor.setPower(0.0);
-                  kickerActive = false;
-              }
+      }
+      // Check if current movement has completed
+      else if (kickerMoving) {
+          long currentTime = System.currentTimeMillis();
+          if ((currentTime - kickerMoveStartTime) >= KICKER_MOVE_DURATION_MS) {
+              // Movement duration has elapsed, stop the motor
+              kicker_motor.setPower(0.0);
+              kickerMoving = false;
           }
       }
+      
+      // Update button states when released
+      if (!gamepad1.dpad_left) dpadLeftPressed = false;
+      if (!gamepad1.dpad_right) dpadRightPressed = false;
 
       // Send telemetry data to driver station
       telemetry.addData("Vertical Power", "%.2f", verticalPower);
@@ -278,18 +299,16 @@ public class tele_op_new_robot extends LinearOpMode {
       }
       if (kicker_motor != null) {
           telemetry.addData("Kicker Motor Power", "%.2f", kicker_motor.getPower());
-          telemetry.addData("Kicker Active", kickerActive);
-          if (kickerActive) {
-              long currentTime = System.currentTimeMillis();
-              double elapsedTime = (currentTime - kickerStartTime) / 1000.0; // Convert to seconds
-              telemetry.addData("Kicker Elapsed Time", "%.2f", elapsedTime);
-
-              // Indicate which direction the kicker is rotating
-              if (kicker_motor.getPower() > 0) {
-                  telemetry.addData("Kicker Direction", "Clockwise");
-              } else if (kicker_motor.getPower() < 0) {
-                  telemetry.addData("Kicker Direction", "Counter-Clockwise");
-              }
+          telemetry.addData("Kicker Position", "%.2f", kickerPosition);
+          telemetry.addData("Kicker Moving", kickerMoving);
+          
+          // Indicate which direction the kicker is rotating
+          if (kicker_motor.getPower() > 0) {
+              telemetry.addData("Kicker Direction", "Clockwise");
+          } else if (kicker_motor.getPower() < 0) {
+              telemetry.addData("Kicker Direction", "Counter-Clockwise");
+          } else {
+              telemetry.addData("Kicker Status", "Stopped");
           }
       } else {
           telemetry.addData("Kicker Motor", "Not Found");
