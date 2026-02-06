@@ -22,45 +22,78 @@ public class ColorDetectionVision extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Initialize the webcam
-        webcam = hardwareMap.get(OpenCvWebcam.class, "Webcam 1"); // Adjust name as needed
+        boolean cameraFound = false;
         
-        // Create and set the pipeline
-        pipeline = new ColorDetectionPipeline(telemetry);
-        webcam.setPipeline(pipeline);
-
-        // Start streaming with the correct rotation
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+        // Initialize the webcam - try common names used in FTC configurations
+        try {
+            // Try different possible camera names based on typical FTC configurations
+            webcam = hardwareMap.get(OpenCvWebcam.class, "Webcam 1");
+            cameraFound = true;
+        } catch (IllegalArgumentException e) {
+            try {
+                webcam = hardwareMap.get(OpenCvWebcam.class, "Webcam 2");
+                cameraFound = true;
+            } catch (IllegalArgumentException e2) {
+                try {
+                    webcam = hardwareMap.get(OpenCvWebcam.class, "camera");
+                    cameraFound = true;
+                } catch (IllegalArgumentException e3) {
+                    // If no webcam is found with common names, inform user
+                    telemetry.addData("Error:", "No webcam found with common names.");
+                    telemetry.addData("Info:", "Check your Robot Configuration.");
+                    telemetry.addData("Expected Names:", "Webcam 1, Webcam 2, or camera");
+                    telemetry.update();
+                    sleep(5000); // Wait 5 seconds before continuing
+                }
             }
-
-            @Override
-            public void onError(int errorCode) {
-                telemetry.addData("Error:", "Camera error: " + errorCode);
-                telemetry.update();
-            }
-        });
-
-        telemetry.addData("Status", "Initialized");
-        telemetry.addData("Instructions", "Press START to begin");
-        telemetry.update();
-
-        // Wait for the game to start
-        waitForStart();
-
-        // Main loop
-        while (opModeIsActive()) {
-            // The pipeline continuously updates telemetry with color information
-            telemetry.update();
-            
-            // Allow some time for other processes
-            sleep(20);
         }
+        
+        if (cameraFound) {
+            // Create and set the pipeline
+            pipeline = new ColorDetectionPipeline(telemetry);
+            webcam.setPipeline(pipeline);
 
-        // Clean up when op mode ends
-        webcam.stopStreaming();
+            // Start streaming with the correct rotation
+            webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+                @Override
+                public void onOpened() {
+                    webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+                }
+
+                @Override
+                public void onError(int errorCode) {
+                    telemetry.addData("Error:", "Camera error: " + errorCode);
+                    telemetry.update();
+                }
+            });
+
+            telemetry.addData("Status", "Initialized");
+            telemetry.addData("Instructions", "Press START to begin");
+            telemetry.update();
+
+            // Wait for the game to start
+            waitForStart();
+
+            // Main loop
+            while (opModeIsActive()) {
+                // The pipeline continuously updates telemetry with color information
+                telemetry.update();
+                
+                // Allow some time for other processes
+                sleep(20);
+            }
+
+            // Clean up when op mode ends
+            webcam.stopStreaming();
+        } else {
+            // If no camera was found, still wait for start and then end
+            waitForStart();
+            while(opModeIsActive()) {
+                telemetry.addData("Status", "No camera found - opmode ending");
+                telemetry.update();
+                sleep(100);
+            }
+        }
     }
 
     // Custom OpenCV pipeline for color detection
