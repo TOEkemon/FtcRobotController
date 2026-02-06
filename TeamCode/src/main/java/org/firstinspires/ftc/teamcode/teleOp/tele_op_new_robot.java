@@ -42,8 +42,8 @@ public class tele_op_new_robot extends LinearOpMode {
   // Constants for gripper servo positions
   private static final double GRIP_SERVO_LEFT_OPEN = 0.0;    // Left gripper servo open position
   private static final double GRIP_SERVO_LEFT_CLOSE = 1.0;   // Left gripper servo closed position
-  private static final double GRIP_SERVO_RIGHT_OPEN = 1.0;   // Right gripper servo open position
-  private static final double GRIP_SERVO_RIGHT_CLOSE = 0.0;  // Right gripper servo closed position
+  private static final double GRIP_SERVO_RIGHT_OPEN = 0.0;   // Right gripper servo open position (changed from 1.0 to 0.0)
+  private static final double GRIP_SERVO_RIGHT_CLOSE = 1.0;  // Right gripper servo closed position (changed from 0.0 to 1.0)
 
   // Variables for servo positions
   private double currentWheelPosition = 0.0; // Start at minimum position
@@ -201,22 +201,22 @@ public class tele_op_new_robot extends LinearOpMode {
           if (rightTriggerPressed && !lastRightTriggerPressed) {
               // Right trigger pressed (and wasn't pressed before) - run shooter forward at 100%
               shooter_motor.setPower(1.0);
-              // Also close gripper servos when shooting forward
-              if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_CLOSE);
-              if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_CLOSE);
+              // Also move gripper servos: left to 1.0, right to 0.0
+              if (grip_servo_left != null) grip_servo_left.setPosition(1.0);
+              if (grip_servo_right != null) grip_servo_right.setPosition(0.0);
           } else if (leftTriggerPressed && !lastLeftTriggerPressed) {
               // Left trigger pressed (and wasn't pressed before) - run shooter backward at 100%
               shooter_motor.setPower(-1.0);
-              // Also close gripper servos when running shooter backward
-              if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_CLOSE);
-              if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_CLOSE);
+              // Also move gripper servos: left to 0.0, right to 1.0
+              if (grip_servo_left != null) grip_servo_left.setPosition(0.0);
+              if (grip_servo_right != null) grip_servo_right.setPosition(1.0);
           } else if ((!rightTriggerPressed && !leftTriggerPressed) &&
                      (lastRightTriggerPressed || lastLeftTriggerPressed)) {
-              // Neither trigger pressed, but one was pressed before - stop shooter
+              // Neither trigger pressed, but one was pressed before - stop shooter and set servos to 0
               shooter_motor.setPower(0.0);
-              // Also open gripper servos when stopping shooter
-              if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_OPEN);
-              if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_OPEN);
+              // Also set gripper servos to 0 when stopping shooter
+              if (grip_servo_left != null) grip_servo_left.setPosition(0.0);
+              if (grip_servo_right != null) grip_servo_right.setPosition(0.0);
           }
       }
 
@@ -320,8 +320,8 @@ public class tele_op_new_robot extends LinearOpMode {
     if (kicker_motor != null) kicker_motor.setPower(0); // Stop kicker motor on shutdown
     // Ensure ball push servo returns to safe position
     if (ball_push != null) ball_push.setPosition(1.0);
-    // Ensure gripper servos return to safe position
-    if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_OPEN);
-    if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_OPEN);
+    // Ensure gripper servos return to safe position (0.0)
+    if (grip_servo_left != null) grip_servo_left.setPosition(0.0);
+    if (grip_servo_right != null) grip_servo_right.setPosition(0.0);
   }
 }
