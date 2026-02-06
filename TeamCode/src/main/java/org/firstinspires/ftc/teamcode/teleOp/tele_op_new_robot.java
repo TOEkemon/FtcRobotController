@@ -37,7 +37,7 @@ public class tele_op_new_robot extends LinearOpMode {
   private long kickerStartTime = 0;              // Time when kicker started
   private static final double KICKER_POWER_CLOCKWISE = 1.0; // Clockwise at full speed (1.0)
   private static final double KICKER_POWER_COUNTER_CLOCKWISE = -1.0; // Counter-clockwise at full speed (-1.0)
-  private static final double KICKER_DURATION = 2.0; // Duration in seconds (2000 ms)
+  private static final double KICKER_DURATION = 0.15; // Duration in seconds (150 ms)
 
   // Constants for gripper servo positions
   private static final double GRIP_SERVO_LEFT_OPEN = 0.0;    // Left gripper servo open position
