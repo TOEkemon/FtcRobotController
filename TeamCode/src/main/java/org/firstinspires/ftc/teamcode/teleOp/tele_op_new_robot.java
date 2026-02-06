@@ -86,9 +86,9 @@ public class tele_op_new_robot extends LinearOpMode {
     if (ball_push != null) ball_push.setPosition(currentBallPushPosition);
     // Set wheel rotation to center initially
     if (wheel_rotation != null) wheel_rotation.setPosition(currentWheelPosition);
-    // Initialize gripper servos to open position
-    if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_OPEN);
-    if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_OPEN);
+    // Initialize gripper servos to neutral position
+    if (grip_servo_left != null) grip_servo_left.setPosition(0.5);
+    if (grip_servo_right != null) grip_servo_right.setPosition(0.5);
 
     telemetry.addData("Status", "Initialized");
     telemetry.update();
@@ -212,11 +212,11 @@ public class tele_op_new_robot extends LinearOpMode {
               if (grip_servo_right != null) grip_servo_right.setPosition(1.0);
           } else if ((!rightTriggerPressed && !leftTriggerPressed) &&
                      (lastRightTriggerPressed || lastLeftTriggerPressed)) {
-              // Neither trigger pressed, but one was pressed before - stop shooter and set servos to 0
+              // Neither trigger pressed, but one was pressed before - stop shooter and set servos to neutral
               shooter_motor.setPower(0.0);
-              // Also set gripper servos to 0 when stopping shooter
-              if (grip_servo_left != null) grip_servo_left.setPosition(0.0);
-              if (grip_servo_right != null) grip_servo_right.setPosition(0.0);
+              // Also set gripper servos to neutral position (0.5) when stopping shooter
+              if (grip_servo_left != null) grip_servo_left.setPosition(0.5);
+              if (grip_servo_right != null) grip_servo_right.setPosition(0.5);
           }
       }
 
@@ -320,8 +320,8 @@ public class tele_op_new_robot extends LinearOpMode {
     if (kicker_motor != null) kicker_motor.setPower(0); // Stop kicker motor on shutdown
     // Ensure ball push servo returns to safe position
     if (ball_push != null) ball_push.setPosition(1.0);
-    // Ensure gripper servos return to safe position (0.0)
-    if (grip_servo_left != null) grip_servo_left.setPosition(0.0);
-    if (grip_servo_right != null) grip_servo_right.setPosition(0.0);
+    // Ensure gripper servos return to neutral position (0.5)
+    if (grip_servo_left != null) grip_servo_left.setPosition(0.5);
+    if (grip_servo_right != null) grip_servo_right.setPosition(0.5);
   }
 }
