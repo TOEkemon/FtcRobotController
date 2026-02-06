@@ -17,6 +17,8 @@ public class tele_op_new_robot extends LinearOpMode {
   private DcMotor kicker_motor; // New kicker motor
   private Servo ball_push;
   private Servo wheel_rotation;
+  private Servo grip_servo_left;  // Left gripper servo
+  private Servo grip_servo_right; // Right gripper servo
 
   // Variables to track button states
   private boolean aPressed = false;
@@ -37,6 +39,12 @@ public class tele_op_new_robot extends LinearOpMode {
   private static final double KICKER_POWER_COUNTER_CLOCKWISE = -1.0; // Counter-clockwise at full speed (-1.0)
   private static final double KICKER_DURATION = 2.0; // Duration in seconds (2000 ms)
 
+  // Constants for gripper servo positions
+  private static final double GRIP_SERVO_LEFT_OPEN = 0.0;    // Left gripper servo open position
+  private static final double GRIP_SERVO_LEFT_CLOSE = 1.0;   // Left gripper servo closed position
+  private static final double GRIP_SERVO_RIGHT_OPEN = 1.0;   // Right gripper servo open position
+  private static final double GRIP_SERVO_RIGHT_CLOSE = 0.0;  // Right gripper servo closed position
+
   // Variables for servo positions
   private double currentWheelPosition = 0.0; // Start at minimum position
   private double currentBallPushPosition = 1.0; // Start open position
@@ -54,6 +62,8 @@ public class tele_op_new_robot extends LinearOpMode {
         kicker_motor = hardwareMap.get(DcMotor.class, "kicker_motor"); // Initialize kicker motor
         ball_push = hardwareMap.get(Servo.class, "ball_push");
         wheel_rotation = hardwareMap.get(Servo.class, "wheel_rotation");
+        grip_servo_left = hardwareMap.get(Servo.class, "grip_servo_left");  // Initialize left gripper servo
+        grip_servo_right = hardwareMap.get(Servo.class, "grip_servo_right"); // Initialize right gripper servo
     } catch (Exception e) {
         telemetry.addData("Error", "Hardware mapping failed: " + e.getMessage());
         telemetry.update();
@@ -76,6 +86,9 @@ public class tele_op_new_robot extends LinearOpMode {
     if (ball_push != null) ball_push.setPosition(currentBallPushPosition);
     // Set wheel rotation to center initially
     if (wheel_rotation != null) wheel_rotation.setPosition(currentWheelPosition);
+    // Initialize gripper servos to open position
+    if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_OPEN);
+    if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_OPEN);
 
     telemetry.addData("Status", "Initialized");
     telemetry.update();
@@ -180,7 +193,7 @@ public class tele_op_new_robot extends LinearOpMode {
           }
       }
 
-      // Handle shooter motor with triggers
+      // Handle shooter motor and gripper servos with triggers
       boolean rightTriggerPressed = gamepad1.right_trigger > 0.5;
       boolean leftTriggerPressed = gamepad1.left_trigger > 0.5;
 
@@ -188,13 +201,22 @@ public class tele_op_new_robot extends LinearOpMode {
           if (rightTriggerPressed && !lastRightTriggerPressed) {
               // Right trigger pressed (and wasn't pressed before) - run shooter forward at 100%
               shooter_motor.setPower(1.0);
+              // Also close gripper servos when shooting forward
+              if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_CLOSE);
+              if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_CLOSE);
           } else if (leftTriggerPressed && !lastLeftTriggerPressed) {
               // Left trigger pressed (and wasn't pressed before) - run shooter backward at 100%
               shooter_motor.setPower(-1.0);
+              // Also close gripper servos when running shooter backward
+              if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_CLOSE);
+              if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_CLOSE);
           } else if ((!rightTriggerPressed && !leftTriggerPressed) &&
                      (lastRightTriggerPressed || lastLeftTriggerPressed)) {
               // Neither trigger pressed, but one was pressed before - stop shooter
               shooter_motor.setPower(0.0);
+              // Also open gripper servos when stopping shooter
+              if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_OPEN);
+              if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_OPEN);
           }
       }
 
@@ -272,6 +294,19 @@ public class tele_op_new_robot extends LinearOpMode {
       } else {
           telemetry.addData("Kicker Motor", "Not Found");
       }
+
+      // Add gripper servo telemetry
+      if (grip_servo_left != null) {
+          telemetry.addData("Grip Servo Left Pos", "%.2f", grip_servo_left.getPosition());
+      } else {
+          telemetry.addData("Grip Servo Left", "Not Found");
+      }
+      if (grip_servo_right != null) {
+          telemetry.addData("Grip Servo Right Pos", "%.2f", grip_servo_right.getPosition());
+      } else {
+          telemetry.addData("Grip Servo Right", "Not Found");
+      }
+
       telemetry.update();
     }
 
@@ -285,5 +320,8 @@ public class tele_op_new_robot extends LinearOpMode {
     if (kicker_motor != null) kicker_motor.setPower(0); // Stop kicker motor on shutdown
     // Ensure ball push servo returns to safe position
     if (ball_push != null) ball_push.setPosition(1.0);
+    // Ensure gripper servos return to safe position
+    if (grip_servo_left != null) grip_servo_left.setPosition(GRIP_SERVO_LEFT_OPEN);
+    if (grip_servo_right != null) grip_servo_right.setPosition(GRIP_SERVO_RIGHT_OPEN);
   }
 }
