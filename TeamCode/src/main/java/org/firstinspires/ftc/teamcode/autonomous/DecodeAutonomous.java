@@ -221,7 +221,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
    @Override
-   public void runOpMode() {
+    public void runOpMode() {
        // Initialize hardware first (this will initialize all hardware components including servos)
        initializeHardware();
 
@@ -249,14 +249,11 @@ public class DecodeAutonomous extends LinearOpMode {
 
        //telemetry to calculate offset of ball center and cam center
        telemetry.addData("centerX: ", driveAndIntake.centerX);
-       telemetry.addData("centerY: ", driveAndIntake.centerY);
-       telemetry.addData("centerX: ", driveAndIntake.camCenterX);
-       telemetry.addData("centerY: ", driveAndIntake.centerY);
-       telemetry.update();
+       telemetry.addData("centerY: ", driveAndIntake.centerY);                               
 
 
 
-
+     
 
 
 
