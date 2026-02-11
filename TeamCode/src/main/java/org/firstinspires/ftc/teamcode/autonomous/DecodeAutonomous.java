@@ -202,6 +202,7 @@ public class DecodeAutonomous extends LinearOpMode {
    private AprilTagVisionProcessor visionProcessor;
    private BalldentifierAndDriver ballDetector;
 
+   private DriveAndIntake driveAndIntake; 
 
    // Autonomous state
    private AutonomousState currentState = AutonomousState.INIT;
@@ -235,7 +236,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        //instance with constructor so opmode knows what motors to use
-       DriveAndIntake driveAndIntake = new DriveAndIntake(
+       driveAndIntake = new DriveAndIntake(
                frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, colorSensor
        );
 
@@ -503,8 +504,8 @@ public class DecodeAutonomous extends LinearOpMode {
                }
                break;
 
-
-           case DRIVE_TO_ROW:
+           // gonna comment this out for now since we are using the drive and intake class to do this part
+            case DRIVE_TO_ROW:
                // Navigation phase: drive to the designated ball collection area
                driveToBallRow(currentRowIndex);
 
@@ -521,6 +522,20 @@ public class DecodeAutonomous extends LinearOpMode {
                // ARTIFACT collection and sorting phase: intake ARTIFACTS while sorting them
                // according to the detected target pattern
                intakeMotor.setPower(1.0); // Start the intake mechanism
+
+
+                //gives driveAndIntake contour and camera values
+               List<MatOfPoint> contours = pipeline.getAllContours();
+               if (contours != null && !contours.isEmpty()) {
+                    driveAndIntake.driveToBall(contours, 640, 480);
+               }
+               
+               //instance with constructor so opmode knows what motors to use
+               driveAndIntake = new DriveAndIntake(
+               frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, colorSensor
+               );
+
+
 
 
                // Use the color sensor to detect ARTIFACT colors as they enter the intake
@@ -561,6 +576,7 @@ public class DecodeAutonomous extends LinearOpMode {
                    currentState = AutonomousState.DRIVE_TO_LINE; // Move to shooting position
                }
                break;
+               
 
 
            case DRIVE_TO_LINE:
