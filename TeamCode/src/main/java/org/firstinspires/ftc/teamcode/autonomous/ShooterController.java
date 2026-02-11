@@ -12,7 +12,7 @@ public class ShooterController {
     
     // Hardware components
     private DcMotor shooterMotor;
-    private Servo ballPushServo;
+    private DcMotor kickerMotor;
     
     // Constants for shooting timing
     private static final double BALL_PUSH_DURATION = 0.5; // seconds to push ball
@@ -27,15 +27,15 @@ public class ShooterController {
     /**
      * Constructor for ShooterController
      * @param shooterMotor The motor that spins the shooter wheel
-     * @param ballPushServo The servo that pushes balls into the shooter
+     * @param kickerMotor The servo that pushes balls into the shooter
      */
-    public ShooterController(DcMotor shooterMotor, Servo ballPushServo) {
+    public ShooterController(DcMotor shooterMotor, DcMotor kickerMotor) {
         this.shooterMotor = shooterMotor;
-        this.ballPushServo = ballPushServo;
+        this.kickerMotor = kickerMotor;
 
         // Initialize servos to default positions if not null
-        if (ballPushServo != null) {
-            ballPushServo.setPosition(0.0); // Retracted position
+        if (kickerMotor != null) {
+            kickerMotor.setPower(0.0); // Retracted position
         }
     }
     
@@ -81,8 +81,8 @@ public class ShooterController {
 
         if (!isBallPushing) {
             // Move the ball push servo to push the ball if it's available
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0); // Extended position to push ball
+            if (kickerMotor != null) {
+                kickerMotor.setPower(1.0); // Extended position to push ball
             }
             isBallPushing = true;
             timer.reset();

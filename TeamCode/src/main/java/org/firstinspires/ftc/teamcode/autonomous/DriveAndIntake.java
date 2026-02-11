@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -62,6 +63,9 @@ public class DriveAndIntake {
    int intakeAreaGreen = colorSensor.green();
    int intakeAreaBlue = colorSensor.blue();
 
+   //find offset trough physcial testing
+   int offset;
+
 
     double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
 
@@ -75,7 +79,7 @@ public class DriveAndIntake {
 
 
    // Constructor
-   public DriveAndIntake(
+   /*public DriveAndIntake(
            DcMotor fl,
            DcMotor fr,
            DcMotor bl,
@@ -89,7 +93,7 @@ public class DriveAndIntake {
        this.backRightMotor = br;
        this.intakeMotor = intake;
        this.colorSensor = colorSensor;
-   }
+   }*/
 
 
 
@@ -136,6 +140,8 @@ public class DriveAndIntake {
 
        //find center of frame
        //IMPORTANT!!! webcam is offset by a few inches, must find offset
+       //comment this out for simpler controlling in decodeAutonomous
+       /*
        Point frameCenter = new Point(camWidth / 2, camHeight / 2);
        int camCenterX = camWidth / 2;
        //align ball's x value with frame's x value
@@ -169,12 +175,19 @@ public class DriveAndIntake {
               frontRightMotor.setPower(0.5);
               backRightMotor.setPower(0.5);
          } else if (currentDraw >= 1.1) {
-              sleep(1500); // Wait for 1.5 seconds to ensure the ball is fully intaken
+
               intakeMotor.setPower(0);
               frontLeftMotor.setPower(0);
               backLeftMotor.setPower(0);
               frontRightMotor.setPower(0);
               backRightMotor.setPower(0);
+
+           try {
+               Thread.sleep( 1000);
+           } catch (InterruptedException ie) {
+               Thread.currentThread().interrupt();
+           }
+              intakeMotor.setPower(0);
     }
        /*while (intakeAreaRed >= 128 && intakeAreaGreen >= 128 && intakeAreaBlue >= 128 && intakeAreaRed <= 150 && intakeAreaGreen <= 150 && intakeAreaBlue <= 150) {
            intakeMotor.setPower(1);

@@ -26,6 +26,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.firstinspires.ftc.teamcode.autonomous.BalldentifierAndDriver;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -181,7 +182,7 @@ public class DecodeAutonomous extends LinearOpMode {
    private DcMotorEx intakeMotor;
    private DcMotor shooterMotor;
    private Servo wheelRotationServo;
-   private Servo ballPushServo;
+   private DcMotor kickerMotor;
    private ColorSensor colorSensor;
    private IMU imu;
    private WebcamName webcam;
@@ -243,7 +244,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
        //instance with constructor so opmode knows what motors to use
        driveAndIntake = new DriveAndIntake(
-               frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, colorSensor
+
        );
 
 
@@ -313,7 +314,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
        // Now initialize controllers with the properly initialized hardware
        barrelController = new BarrelController(wheelRotationServo, colorSensor);
-       shooterController = new ShooterController(shooterMotor, ballPushServo);
+       shooterController = new ShooterController(shooterMotor, kickerMotor);
        visionProcessor = new AprilTagVisionProcessor();
        ballDetector = pipeline;
 
@@ -412,7 +413,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
        // Servos
        wheelRotationServo = hardwareMap.get(Servo.class, "wheel_rotation");
-       ballPushServo = hardwareMap.get(Servo.class, "ball_push");
+       kickerMotor = hardwareMap.get(DcMotor.class, "kicker_motor");
 
 
        // Sensors
@@ -481,6 +482,7 @@ public class DecodeAutonomous extends LinearOpMode {
                } else {
                    // Still scanning - rotate slowly to search for AprilTags
                    // Rotate at a slow speed to scan the environment
+                   String[] detectedPattern = visionProcessor.getTargetPattern();
                    double scanPower = 0.2; // Slow rotation power
                    frontLeftMotor.setPower(scanPower);
                    frontRightMotor.setPower(-scanPower);
@@ -511,6 +513,7 @@ public class DecodeAutonomous extends LinearOpMode {
                } else {
                    // Still scanning - rotate slowly to search for AprilTags
                    // Rotate at a slow speed to scan the environment
+                   String[] detectedPattern = visionProcessor.getTargetPattern();
                    double scanPower = 0.2; // Slow rotation power
                    frontLeftMotor.setPower(scanPower);
                    frontRightMotor.setPower(-scanPower);
@@ -536,15 +539,76 @@ public class DecodeAutonomous extends LinearOpMode {
                
                //instance with constructor so opmode knows what motors to use
                driveAndIntake = new DriveAndIntake(
-               frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, colorSensor
                );
+
+               Point frameCenter = new Point(driveAndIntake.camWidth / 2, driveAndIntake.camHeight / 2);
+               int camCenterX = driveAndIntake.camWidth / 2;
+
+               //align ball's x value with frame's x value
+                if (driveAndIntake.centerX != camCenterX-driveAndIntake.offset) {
+                    frontLeftMotor.setPower(0.2);
+                    backLeftMotor.setPower(0.2);
+                    frontRightMotor.setPower(-0.2);
+                    backRightMotor.setPower(-0.2);
+                    if (driveAndIntake.centerX == camCenterX) {
+                        frontLeftMotor.setPower(0);
+                        backLeftMotor.setPower(0);
+                        frontRightMotor.setPower(0);
+                        backRightMotor.setPower(0);
+
+
+                    }
+                }
+                // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
+                //currently unused
+                driveAndIntake.intakeAreaRed = colorSensor.red();
+                driveAndIntake.intakeAreaGreen = colorSensor.green();
+                driveAndIntake.intakeAreaBlue = colorSensor.blue();
+                //when ball taken in, amp draw will increase, so use that as threshold to stop driving forward and stop intake
+                intakeMotor.setPower(1);
+                driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+                if (driveAndIntake.currentDraw < 1.1) { // Adjust the threshold as needed based on testing
+                    driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+
+
+                    frontLeftMotor.setPower(0.5);
+                    backLeftMotor.setPower(0.5);
+                    frontRightMotor.setPower(0.5);
+                    backRightMotor.setPower(0.5);
+                } else if (driveAndIntake.currentDraw >= 1.1) {
+
+                    intakeMotor.setPower(0);
+                    frontLeftMotor.setPower(0);
+                    backLeftMotor.setPower(0);
+                    frontRightMotor.setPower(0);
+                    backRightMotor.setPower(0);
+
+                    sleep(1500);
+                    intakeMotor.setPower(0);
+                }
+       /*while (intakeAreaRed >= 128 && intakeAreaGreen >= 128 && intakeAreaBlue >= 128 && intakeAreaRed <= 150 && intakeAreaGreen <= 150 && intakeAreaBlue <= 150) {
+           intakeMotor.setPower(1);
+           frontLeftMotor.setPower(.5);
+           backLeftMotor.setPower(.5);
+           frontRightMotor.setPower(.5);
+           backRightMotor.setPower(.5);
+           if (intakeAreaRed < 128 || intakeAreaGreen < 128 || intakeAreaBlue < 128 || intakeAreaRed > 150 || intakeAreaGreen > 150 || intakeAreaBlue > 150) {
+               intakeMotor.setPower(0);
+               frontLeftMotor.setPower(0);
+               backLeftMotor.setPower(0);
+               frontRightMotor.setPower(0);
+               backRightMotor.setPower(0);
+               break;
+           }
+         }*/
                telemetry.addData("centerX: ", driveAndIntake.centerX);
                telemetry.addData("centerY: ", driveAndIntake.centerY); 
                telemetry.addData("camCenterX: ", driveAndIntake.camCenterX);
                telemetry.addData("camCenterY: ", driveAndIntake.camCenterY);
                telemetry.addData("color: ", driveAndIntake.intakeAreaRed + ", " + driveAndIntake.intakeAreaGreen + ", " + driveAndIntake.intakeAreaBlue);
                telemetry.addData("Current Draw",driveAndIntake.currentDraw);
-               telemetry.update();        
+               telemetry.update();
+               sleep(10);
 
 
                // Check if we've reached the target location
