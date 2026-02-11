@@ -10,6 +10,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.DcMotorEx;  // Add this import
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;  // Add this import
+
 
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -27,6 +30,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.firstinspires.ftc.teamcode.autonomous.BalldentifierAndDriver;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
+
+
 
 
 import java.util.List;
@@ -168,11 +173,12 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
    // Hardware components
+   //CHANGED ALL INSTANCES OF DcMotor intakeMotor TO DcMotorEx intakeMotor TO ALLOW FOR CURRENT MONITORING
    private DcMotor frontLeftMotor;
    private DcMotor frontRightMotor;
    private DcMotor backLeftMotor;
    private DcMotor backRightMotor;
-   private DcMotor intakeMotor;
+   private DcMotorEx intakeMotor;
    private DcMotor shooterMotor;
    private Servo wheelRotationServo;
    private Servo ballPushServo;
@@ -250,7 +256,11 @@ public class DecodeAutonomous extends LinearOpMode {
 
        //telemetry to calculate offset of ball center and cam center
        telemetry.addData("centerX: ", driveAndIntake.centerX);
-       telemetry.addData("centerY: ", driveAndIntake.centerY);                               
+       telemetry.addData("centerY: ", driveAndIntake.centerY); 
+       telemetry.addData("camCenterX: ", driveAndIntake.camCenterX);
+       telemetry.addData("camCenterY: ", driveAndIntake.camCenterY);
+       telemetry.addData("color: ", driveAndIntake.intakeAreaRed + ", " + driveAndIntake.intakeAreaGreen + ", " + driveAndIntake.intakeAreaBlue);
+       telemetry.update();                           
 
 
 
@@ -396,7 +406,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        // Intake and shooter motors
-       intakeMotor = hardwareMap.get(DcMotor.class, "intake_motor");
+       intakeMotor = hardwareMap.get(DcMotorEx.class, "intake_motor");
        shooterMotor = hardwareMap.get(DcMotor.class, "shooter_motor");
 
 
@@ -476,6 +486,11 @@ public class DecodeAutonomous extends LinearOpMode {
                    frontRightMotor.setPower(-scanPower);
                    backLeftMotor.setPower(scanPower);
                    backRightMotor.setPower(-scanPower);
+                   if (detectedPattern != null) {
+                       targetPattern = detectedPattern.clone();
+                       stopDriveMotors();
+                       currentState = AutonomousState.DRIVE_TO_ROW;
+                   }
                }
 
 
@@ -501,13 +516,35 @@ public class DecodeAutonomous extends LinearOpMode {
                    frontRightMotor.setPower(-scanPower);
                    backLeftMotor.setPower(scanPower);
                    backRightMotor.setPower(-scanPower);
+                   if (detectedPattern != null) {
+                       targetPattern = detectedPattern.clone();
+                       stopDriveMotors();
+                       currentState = AutonomousState.DRIVE_TO_ROW;
+                   }
                }
                break;
 
            // gonna comment this out for now since we are using the drive and intake class to do this part
             case DRIVE_TO_ROW:
                // Navigation phase: drive to the designated ball collection area
-               driveToBallRow(currentRowIndex);
+               //driveToBallRow(currentRowIndex);
+
+               List<MatOfPoint> contours = pipeline.getAllContours();
+               if (contours != null && !contours.isEmpty()) {
+                    driveAndIntake.driveToBall(contours, 640, 480);
+               }
+               
+               //instance with constructor so opmode knows what motors to use
+               driveAndIntake = new DriveAndIntake(
+               frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, colorSensor
+               );
+               telemetry.addData("centerX: ", driveAndIntake.centerX);
+               telemetry.addData("centerY: ", driveAndIntake.centerY); 
+               telemetry.addData("camCenterX: ", driveAndIntake.camCenterX);
+               telemetry.addData("camCenterY: ", driveAndIntake.camCenterY);
+               telemetry.addData("color: ", driveAndIntake.intakeAreaRed + ", " + driveAndIntake.intakeAreaGreen + ", " + driveAndIntake.intakeAreaBlue);
+               telemetry.addData("Current Draw",driveAndIntake.currentDraw);
+               telemetry.update();        
 
 
                // Check if we've reached the target location
@@ -524,17 +561,7 @@ public class DecodeAutonomous extends LinearOpMode {
                intakeMotor.setPower(1.0); // Start the intake mechanism
 
 
-                //gives driveAndIntake contour and camera values
-               List<MatOfPoint> contours = pipeline.getAllContours();
-               if (contours != null && !contours.isEmpty()) {
-                    driveAndIntake.driveToBall(contours, 640, 480);
-               }
                
-               //instance with constructor so opmode knows what motors to use
-               driveAndIntake = new DriveAndIntake(
-               frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, colorSensor
-               );
-
 
 
 

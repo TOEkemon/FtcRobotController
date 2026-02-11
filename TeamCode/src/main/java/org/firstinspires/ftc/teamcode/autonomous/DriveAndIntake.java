@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;  // Add this import
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;  // Add this import
+
 
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -29,7 +32,7 @@ public class DriveAndIntake {
    private DcMotor frontRightMotor;
    private DcMotor backLeftMotor;
    private DcMotor backRightMotor;
-   private DcMotor intakeMotor;
+   private DcMotorEx intakeMotor;
    private DcMotor shooterMotor;
    private Servo wheelRotationServo;
    private Servo ballPushServo;
@@ -55,8 +58,12 @@ public class DriveAndIntake {
    int camCenterX = 0;
    int camCenterY = 0;
 
+   int intakeAreaRed = colorSensor.red();
+   int intakeAreaGreen = colorSensor.green();
+   int intakeAreaBlue = colorSensor.blue();
 
 
+    double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
 
    // contour is a MatOfPoint
 
@@ -73,7 +80,7 @@ public class DriveAndIntake {
            DcMotor fr,
            DcMotor bl,
            DcMotor br,
-           DcMotor intake,
+           DcMotorEx intake,
            ColorSensor colorSensor
    ) {
        this.frontLeftMotor = fl;
@@ -147,10 +154,29 @@ public class DriveAndIntake {
            }
        }
        // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
-       int intakeAreaRed = colorSensor.red();
-       int intakeAreaGreen = colorSensor.green();
-       int intakeAreaBlue = colorSensor.blue();
-       while (intakeAreaRed >= 128 && intakeAreaGreen >= 128 && intakeAreaBlue >= 128 && intakeAreaRed <= 150 && intakeAreaGreen <= 150 && intakeAreaBlue <= 150) {
+       intakeAreaRed = colorSensor.red();
+       intakeAreaGreen = colorSensor.green();
+       intakeAreaBlue = colorSensor.blue();
+       //when ball taken in, amp draw will increase, so use that as threshold to stop driving forward and stop intake
+       intakeMotor.setPower(1);
+       currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+       if (currentDraw < 1.1) { // Adjust the threshold as needed based on testing
+              currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+             
+              
+              frontLeftMotor.setPower(0.5);
+              backLeftMotor.setPower(0.5);
+              frontRightMotor.setPower(0.5);
+              backRightMotor.setPower(0.5);
+         } else if (currentDraw >= 1.1) {
+              sleep(1500); // Wait for 1.5 seconds to ensure the ball is fully intaken
+              intakeMotor.setPower(0);
+              frontLeftMotor.setPower(0);
+              backLeftMotor.setPower(0);
+              frontRightMotor.setPower(0);
+              backRightMotor.setPower(0);
+    }
+       /*while (intakeAreaRed >= 128 && intakeAreaGreen >= 128 && intakeAreaBlue >= 128 && intakeAreaRed <= 150 && intakeAreaGreen <= 150 && intakeAreaBlue <= 150) {
            intakeMotor.setPower(1);
            frontLeftMotor.setPower(.5);
            backLeftMotor.setPower(.5);
@@ -164,11 +190,12 @@ public class DriveAndIntake {
                backRightMotor.setPower(0);
                break;
            }
+         }*/
 
 
 
 
-       }
+       
 
 
 
