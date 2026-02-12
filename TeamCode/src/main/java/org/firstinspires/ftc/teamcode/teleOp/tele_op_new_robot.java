@@ -16,7 +16,7 @@ public class tele_op_new_robot extends LinearOpMode {
   private DcMotor shooter_motor;
   private DcMotor kicker_motor; // New kicker motor
   private Servo ball_push;
-  private Servo wheel_rotation;
+  private DcMotor wheel_rotation;
   private Servo grip_servo_left;  // Left gripper servo
   private Servo grip_servo_right; // Right gripper servo
 
@@ -39,12 +39,26 @@ public class tele_op_new_robot extends LinearOpMode {
   private double kickerPosition = 0.0; // Current position of kicker
   private static final double MAX_KICKER_POSITION = 1.0; // Maximum position limit
   private static final double MIN_KICKER_POSITION = -1.0; // Minimum position limit
-  
+
   // Variables for kicker motor timing
   private boolean kickerMoving = false; // Is kicker currently moving
   private long kickerMoveStartTime = 0; // Time when kicker started moving
   private int kickerPhase = 0; // Phase: 0 = not moving, 1 = positive movement, 2 = negative movement
   private double kickerTargetPower = 0.0; // Target power for current movement
+
+  // Variables for wheel rotation motor position control
+  private static final double WHEEL_ROTATION_INCREMENT = 0.14; // Amount to move per button press (1/3 of range)
+  private static final double WHEEL_ROTATION_POWER = 0.8; // Power level for wheel rotation movement
+  private static final long WHEEL_ROTATION_MOVE_DURATION_MS = 150; // Duration to run motor for each increment (0.15 sec)
+  private double wheelRotationPosition = 0.0; // Current position of wheel rotation
+  private static final double MAX_WHEEL_ROTATION_POSITION = 1.0; // Maximum position limit
+  private static final double MIN_WHEEL_ROTATION_POSITION = 0.0; // Minimum position limit
+
+  // Variables for wheel rotation motor timing
+  private boolean wheelRotationMoving = false; // Is wheel rotation currently moving
+  private long wheelRotationMoveStartTime = 0; // Time when wheel rotation started moving
+  private int wheelRotationPhase = 0; // Phase: 0 = not moving, 1 = positive movement, 2 = negative movement
+  private double wheelRotationTargetPower = 0.0; // Target power for current movement
 
   // Constants for gripper servo positions
   private static final double GRIP_SERVO_LEFT_OPEN = 0.0;    // Left gripper servo open position
@@ -68,7 +82,7 @@ public class tele_op_new_robot extends LinearOpMode {
         shooter_motor = hardwareMap.get(DcMotor.class, "shooter_motor");
         kicker_motor = hardwareMap.get(DcMotor.class, "kicker_motor"); // Initialize kicker motor
         ball_push = hardwareMap.get(Servo.class, "ball_push");
-        wheel_rotation = hardwareMap.get(Servo.class, "wheel_rotation");
+        wheel_rotation = hardwareMap.get(DcMotor.class, "wheel_rotation");
         grip_servo_left = hardwareMap.get(Servo.class, "grip_servo_left");  // Initialize left gripper servo
         grip_servo_right = hardwareMap.get(Servo.class, "grip_servo_right"); // Initialize right gripper servo
     } catch (Exception e) {
@@ -88,11 +102,10 @@ public class tele_op_new_robot extends LinearOpMode {
     if (front_right_motor != null) front_right_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     if (shooter_motor != null) shooter_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     if (kicker_motor != null) kicker_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // Configure kicker motor brake mode
+    if (wheel_rotation != null) wheel_rotation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // Configure wheel rotation motor brake mode
 
     // Initialize servos to safe positions
     if (ball_push != null) ball_push.setPosition(currentBallPushPosition);
-    // Set wheel rotation to center initially
-    if (wheel_rotation != null) wheel_rotation.setPosition(currentWheelPosition);
     // Initialize gripper servos to neutral position
     if (grip_servo_left != null) grip_servo_left.setPosition(0.5);
     if (grip_servo_right != null) grip_servo_right.setPosition(0.5);
@@ -161,28 +174,62 @@ public class tele_op_new_robot extends LinearOpMode {
           }
       }
 
-      // Handle wheel rotation servo - 120 degree rotation (1/3 of full range)
+      // Handle wheel rotation motor - 120 degree rotation (1/3 of full range)
       if (wheel_rotation != null) {
-          if (gamepad1.b && !bPressed) {
-              // Move servo 1/3 of the way toward one end (120 degrees worth of movement)
-              currentWheelPosition += 0.14; // Approximately 1/3 of the servo range
-              if (currentWheelPosition > 1.0) currentWheelPosition = 1.0;
-              wheel_rotation.setPosition(currentWheelPosition);
-              bPressed = true;
-          } else if (!gamepad1.b) {
-              bPressed = false;
+          // Check if we need to start a new movement for wheel rotation
+          if (!wheelRotationMoving) {
+              // Handle clockwise increment (B button)
+              if (gamepad1.b && !bPressed) {
+                  // Move wheel rotation position positively by increment
+                  wheelRotationPosition += WHEEL_ROTATION_INCREMENT;
+                  // Limit to maximum position
+                  if (wheelRotationPosition > MAX_WHEEL_ROTATION_POSITION) {
+                      wheelRotationPosition = MAX_WHEEL_ROTATION_POSITION;
+                  }
+                  // Start motor movement
+                  wheelRotationTargetPower = WHEEL_ROTATION_POWER;
+                  wheel_rotation.setPower(wheelRotationTargetPower);
+                  wheelRotationMoving = true;
+                  wheelRotationMoveStartTime = System.currentTimeMillis();
+                  bPressed = true; // Mark that B button is pressed
+              }
+              // Handle counter-clockwise increment (Y button)
+              else if (gamepad1.y && !yPressed) {
+                  // Move wheel rotation position negatively by increment
+                  wheelRotationPosition -= WHEEL_ROTATION_INCREMENT;
+                  // Limit to minimum position
+                  if (wheelRotationPosition < MIN_WHEEL_ROTATION_POSITION) {
+                      wheelRotationPosition = MIN_WHEEL_ROTATION_POSITION;
+                  }
+                  // Start motor movement
+                  wheelRotationTargetPower = -WHEEL_ROTATION_POWER; // Negative power for reverse direction
+                  wheel_rotation.setPower(wheelRotationTargetPower);
+                  wheelRotationMoving = true;
+                  wheelRotationMoveStartTime = System.currentTimeMillis();
+                  yPressed = true; // Mark that Y button is pressed
+              }
           }
+          // Check if current movement has completed
+          else if (wheelRotationMoving) {
+              long currentTime = System.currentTimeMillis();
+              if ((currentTime - wheelRotationMoveStartTime) >= WHEEL_ROTATION_MOVE_DURATION_MS) {
+                  // Regular incremental stepper movement completed
+                  wheel_rotation.setPower(0.0);
+                  wheelRotationMoving = false;
 
-          if (gamepad1.y && !yPressed) {
-              // Move servo 1/3 of the way toward the other end (120 degrees worth of movement)
-              currentWheelPosition -= 0.14; // Approximately 1/3 of the servo range
-              if (currentWheelPosition < 0.0) currentWheelPosition = 0.0;
-              wheel_rotation.setPosition(currentWheelPosition);
-              yPressed = true;
-          } else if (!gamepad1.y) {
-              yPressed = false;
+                  // Reset the appropriate button state
+                  if (bPressed) {
+                      bPressed = false;
+                  } else if (yPressed) {
+                      yPressed = false;
+                  }
+              }
           }
       }
+
+      // Update button states when released
+      if (!gamepad1.b) bPressed = false;
+      if (!gamepad1.y) yPressed = false;
 
       // Handle ball push servo
       if (ball_push != null) {
@@ -315,7 +362,7 @@ public class tele_op_new_robot extends LinearOpMode {
       telemetry.addData("Vertical Power", "%.2f", verticalPower);
       telemetry.addData("Horizontal Power", "%.2f", horizontalPower);
       telemetry.addData("Pivot Power", "%.2f", pivot);
-      telemetry.addData("Wheel Position", "%.2f", currentWheelPosition);
+      telemetry.addData("Wheel Rotation Position", "%.2f", wheelRotationPosition);
       telemetry.addData("Ball Push Position", "%.2f", currentBallPushPosition);
       if (intakemotor != null) {
           telemetry.addData("Intake Motor Power", "%.2f", intakemotor.getPower());
@@ -331,7 +378,7 @@ public class tele_op_new_robot extends LinearOpMode {
           telemetry.addData("Kicker Motor Power", "%.2f", kicker_motor.getPower());
           telemetry.addData("Kicker Position", "%.2f", kickerPosition);
           telemetry.addData("Kicker Moving", kickerMoving);
-          
+
           // Indicate which direction the kicker is rotating
           if (kicker_motor.getPower() > 0) {
               telemetry.addData("Kicker Direction", "Clockwise");
@@ -342,6 +389,22 @@ public class tele_op_new_robot extends LinearOpMode {
           }
       } else {
           telemetry.addData("Kicker Motor", "Not Found");
+      }
+      if (wheel_rotation != null) {
+          telemetry.addData("Wheel Rotation Motor Power", "%.2f", wheel_rotation.getPower());
+          telemetry.addData("Wheel Rotation Position", "%.2f", wheelRotationPosition);
+          telemetry.addData("Wheel Rotation Moving", wheelRotationMoving);
+
+          // Indicate which direction the wheel rotation is moving
+          if (wheel_rotation.getPower() > 0) {
+              telemetry.addData("Wheel Rotation Direction", "Clockwise");
+          } else if (wheel_rotation.getPower() < 0) {
+              telemetry.addData("Wheel Rotation Direction", "Counter-Clockwise");
+          } else {
+              telemetry.addData("Wheel Rotation Status", "Stopped");
+          }
+      } else {
+          telemetry.addData("Wheel Rotation Motor", "Not Found");
       }
 
       // Add gripper servo telemetry
@@ -367,6 +430,7 @@ public class tele_op_new_robot extends LinearOpMode {
     if (intakemotor != null) intakemotor.setPower(0);
     if (shooter_motor != null) shooter_motor.setPower(0);
     if (kicker_motor != null) kicker_motor.setPower(0); // Stop kicker motor on shutdown
+    if (wheel_rotation != null) wheel_rotation.setPower(0); // Stop wheel rotation motor on shutdown
     // Ensure ball push servo returns to safe position
     if (ball_push != null) ball_push.setPosition(1.0);
     // Ensure gripper servos return to neutral position (0.5)
