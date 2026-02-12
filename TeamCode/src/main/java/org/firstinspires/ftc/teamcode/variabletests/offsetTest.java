@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.variabletests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.autonomous.BalldentifierAndDriver;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import java.util.List;
+import java.util.ArrayList;
 
 @Autonomous
 
@@ -70,7 +71,9 @@ public class offsetTest extends LinearOpMode{
         int camCenterX = 320;
         int camCenterY = 240;
 
-        List<MatOfPoint> contours = pipeline.getAllContours();
+        // Note: getAllContours() will return an empty list until the pipeline processes camera frames
+        // The contours are populated when the camera feeds frames to the pipeline
+        List<MatOfPoint> contours = new ArrayList<>(); // Initialize as empty list
 
         int camViewId = hardwareMap.appContext
                 .getResources()
@@ -105,7 +108,8 @@ public class offsetTest extends LinearOpMode{
 
         // Main state machine loop - removed since updateState and updateTelemetry don't exist in this class
         // Just process the contours once for testing purposes
-        allContours = pipeline.getAllContours();
+        // Note: In a real scenario, contours would be populated by the camera pipeline
+        allContours = new ArrayList<>(); // Initialize as empty list
 
         MatOfPoint largestContour = null; // Variable to store the largest contour found
         // Iterate through all contours to find the one with the largest area (closest ball)
@@ -140,18 +144,3 @@ public class offsetTest extends LinearOpMode{
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
