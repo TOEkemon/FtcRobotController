@@ -604,7 +604,7 @@ public class DecodeAutonomous extends LinearOpMode {
          }*/
                telemetry.addData("centerX: ", driveAndIntake.centerX);
                telemetry.addData("centerY: ", driveAndIntake.centerY); 
-               telemetry.addData("camCenterX: ", driveAndIntake.camCenterX);
+               telemetry.addData("camCenterX: ", camCenterX);
                telemetry.addData("camCenterY: ", driveAndIntake.camCenterY);
                telemetry.addData("color: ", driveAndIntake.intakeAreaRed + ", " + driveAndIntake.intakeAreaGreen + ", " + driveAndIntake.intakeAreaBlue);
                telemetry.addData("Current Draw",driveAndIntake.currentDraw);

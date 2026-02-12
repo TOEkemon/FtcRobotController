@@ -67,7 +67,7 @@ public class DriveAndIntake {
    int offset;
 
 
-    double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+   double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
 
    // contour is a MatOfPoint
 
