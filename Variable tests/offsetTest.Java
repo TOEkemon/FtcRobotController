@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -25,6 +23,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.firstinspires.ftc.teamcode.autonomous.BalldentifierAndDriver;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -37,6 +37,13 @@ public class offsetTest extends LinearOpMode{
 
     private WebcamName webcam;
     private DcMotorEx intakeMotor;
+    private IMU imu;  // Added missing IMU declaration
+    private OpenCvCamera camera;  // Added missing camera declaration
+    private long startTime;  // Added missing startTime declaration
+    private List<MatOfPoint> allContours;  // Added missing allContours declaration
+    private double maxArea = 0;  // Added missing maxArea declaration
+    private int centerX = 0;  // Added missing centerX declaration
+    private int centerY = 0;  // Added missing centerY declaration
 
 
     private BalldentifierAndDriver ballDetector;
@@ -92,29 +99,14 @@ public class offsetTest extends LinearOpMode{
         });
 
 
-
-
         // Wait for start
         waitForStart();
         startTime = System.currentTimeMillis();
 
+        // Main state machine loop - removed since updateState and updateTelemetry don't exist in this class
+        // Just process the contours once for testing purposes
+        allContours = pipeline.getAllContours();
 
-
-
-
-
-        // Main state machine loop
-        while (opModeIsActive() && !isStopRequested()) {
-            updateState();
-
-
-            // Update telemetry
-            updateTelemetry();
-
-
-            // Small sleep to prevent busy-waiting
-            sleep(10);
-        }
         MatOfPoint largestContour = null; // Variable to store the largest contour found
         // Iterate through all contours to find the one with the largest area (closest ball)
         for (MatOfPoint contour : allContours) {
