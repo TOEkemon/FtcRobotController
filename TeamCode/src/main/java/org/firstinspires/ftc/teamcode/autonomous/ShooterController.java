@@ -88,8 +88,8 @@ public class ShooterController {
             timer.reset();
         } else if (timer.seconds() >= BALL_PUSH_DURATION) {
             // Retract the ball push servo after the push duration if it's available
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(0.0); // Retracted position
+            if (kickerMotor != null) {
+                kickerMotor.setPower(0.0); // Retracted position
             }
             isBallPushing = false;
 
@@ -122,8 +122,8 @@ public class ShooterController {
      */
     public void pushSingleBall() {
         // Push the ball if servo is available
-        if (ballPushServo != null) {
-            ballPushServo.setPosition(1.0);
+        if (kickerMotor != null) {
+            kickerMotor.setPower(1.0);
         }
 
         // Wait for the push duration
@@ -134,8 +134,8 @@ public class ShooterController {
         }
 
         // Retract the servo if available
-        if (ballPushServo != null) {
-            ballPushServo.setPosition(0.0);
+        if (kickerMotor != null) {
+            kickerMotor.setPower(0.0);
         }
     }
     
@@ -161,8 +161,8 @@ public class ShooterController {
     public void reset() {
         stopShooter();
         // Retract the servo if available
-        if (ballPushServo != null) {
-            ballPushServo.setPosition(0.0); // Retracted position
+        if (kickerMotor != null) {
+            kickerMotor.setPower(0.0); // Retracted position
         }
         isShootingSequenceActive = false;
         currentShotIndex = 0;

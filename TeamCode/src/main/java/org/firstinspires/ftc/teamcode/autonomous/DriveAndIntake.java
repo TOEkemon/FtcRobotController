@@ -134,6 +134,7 @@ public class DriveAndIntake {
                centerY = (int) (moments.get_m01() / moments.get_m00());
            }
        }
+       double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
 
 
 
