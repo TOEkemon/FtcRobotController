@@ -550,12 +550,12 @@ public class DecodeAutonomous extends LinearOpMode {
                int camCenterX = driveAndIntake.camWidth / 2;
 
                //align ball's x value with frame's x value
-                if (ballX != camCenterX-driveAndIntake.offset) {
+                if (ballX <= camCenterX-driveAndIntake.offset-20 && ballX >= camCenterX-driveAndIntake.offset+20) {
                     frontLeftMotor.setPower(0.2);
                     backLeftMotor.setPower(0.2);
                     frontRightMotor.setPower(-0.2);
                     backRightMotor.setPower(-0.2);
-                    if (ballX == camCenterX) {
+                    if (ballX >= camCenterX-driveAndIntake.offset-20 && ballX <= camCenterX-driveAndIntake.offset+20) {
                         frontLeftMotor.setPower(0);
                         backLeftMotor.setPower(0);
                         frontRightMotor.setPower(0);
