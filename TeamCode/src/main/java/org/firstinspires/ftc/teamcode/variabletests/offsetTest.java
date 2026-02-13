@@ -138,6 +138,8 @@ public class offsetTest extends LinearOpMode{
             telemetry.update();
 
             sleep(50); // Small delay to allow other processes to run
+
+            intakeMotor.setPower(1);
         }
     }
 

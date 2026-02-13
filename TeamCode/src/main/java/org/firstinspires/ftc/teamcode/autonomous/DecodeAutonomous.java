@@ -572,7 +572,7 @@ public class DecodeAutonomous extends LinearOpMode {
                 //when ball taken in, amp draw will increase, so use that as threshold to stop driving forward and stop intake
                 intakeMotor.setPower(1);
                 driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
-                if (driveAndIntake.currentDraw < 1.1) { // Adjust the threshold as needed based on testing
+                if (driveAndIntake.currentDraw < 6.8) { // Adjust the threshold as needed based on testing
                     driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
 
 
@@ -580,7 +580,7 @@ public class DecodeAutonomous extends LinearOpMode {
                     backLeftMotor.setPower(0.5);
                     frontRightMotor.setPower(0.5);
                     backRightMotor.setPower(0.5);
-                } else if (driveAndIntake.currentDraw >= 1.1) {
+                } else if (driveAndIntake.currentDraw >= 6.8) {
 
                     intakeMotor.setPower(0);
                     frontLeftMotor.setPower(0);

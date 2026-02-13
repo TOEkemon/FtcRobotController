@@ -66,7 +66,7 @@ public class DriveAndIntake {
    int intakeAreaBlue = colorSensor.blue();
 
    //find offset trough physcial testing
-   int offset;
+   int offset = 39;
 
 
    double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
