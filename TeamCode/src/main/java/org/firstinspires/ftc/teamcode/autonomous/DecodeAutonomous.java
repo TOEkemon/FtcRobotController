@@ -561,36 +561,38 @@ public class DecodeAutonomous extends LinearOpMode {
                         frontRightMotor.setPower(0);
                         backRightMotor.setPower(0);
 
+                        // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
+                        //currently unused
+                        driveAndIntake.intakeAreaRed = colorSensor.red();
+                        driveAndIntake.intakeAreaGreen = colorSensor.green();
+                        driveAndIntake.intakeAreaBlue = colorSensor.blue();
+                        //when ball taken in, amp draw will increase, so use that as threshold to stop driving forward and stop intake
+                        intakeMotor.setPower(1);
+                        driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+                        if (driveAndIntake.currentDraw < 6.8) { // Adjust the threshold as needed based on testing
+                            driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+
+
+                            frontLeftMotor.setPower(0.5);
+                            backLeftMotor.setPower(0.5);
+                            frontRightMotor.setPower(0.5);
+                            backRightMotor.setPower(0.5);
+                        } else if (driveAndIntake.currentDraw >= 6.8) {
+
+                            intakeMotor.setPower(0);
+                            frontLeftMotor.setPower(0);
+                            backLeftMotor.setPower(0);
+                            frontRightMotor.setPower(0);
+                            backRightMotor.setPower(0);
+
+                            sleep(1500);
+                            intakeMotor.setPower(0);
+                        }
+
 
                     }
                 }
-                // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
-                //currently unused
-                driveAndIntake.intakeAreaRed = colorSensor.red();
-                driveAndIntake.intakeAreaGreen = colorSensor.green();
-                driveAndIntake.intakeAreaBlue = colorSensor.blue();
-                //when ball taken in, amp draw will increase, so use that as threshold to stop driving forward and stop intake
-                intakeMotor.setPower(1);
-                driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
-                if (driveAndIntake.currentDraw < 6.8) { // Adjust the threshold as needed based on testing
-                    driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
 
-
-                    frontLeftMotor.setPower(0.5);
-                    backLeftMotor.setPower(0.5);
-                    frontRightMotor.setPower(0.5);
-                    backRightMotor.setPower(0.5);
-                } else if (driveAndIntake.currentDraw >= 6.8) {
-
-                    intakeMotor.setPower(0);
-                    frontLeftMotor.setPower(0);
-                    backLeftMotor.setPower(0);
-                    frontRightMotor.setPower(0);
-                    backRightMotor.setPower(0);
-
-                    sleep(1500);
-                    intakeMotor.setPower(0);
-                }
        /*while (intakeAreaRed >= 128 && intakeAreaGreen >= 128 && intakeAreaBlue >= 128 && intakeAreaRed <= 150 && intakeAreaGreen <= 150 && intakeAreaBlue <= 150) {
            intakeMotor.setPower(1);
            frontLeftMotor.setPower(.5);
