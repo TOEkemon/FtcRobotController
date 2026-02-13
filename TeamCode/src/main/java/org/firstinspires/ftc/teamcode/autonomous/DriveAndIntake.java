@@ -56,8 +56,10 @@ public class DriveAndIntake {
    int centerY = 0;
 
 
-   int camCenterX = 0;
-   int camCenterY = 0;
+   int camCenterX = 320;
+   int camCenterY = 240;
+
+
 
    int intakeAreaRed = colorSensor.red();
    int intakeAreaGreen = colorSensor.green();
@@ -68,6 +70,10 @@ public class DriveAndIntake {
 
 
    double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+
+    public int getCenterX() {
+        return centerX;
+    }
 
    // contour is a MatOfPoint
 
@@ -110,14 +116,15 @@ public class DriveAndIntake {
 
 
 
+       double maxArea = 0;   // RESET EVERY FRAME
+       MatOfPoint largestContour = null;
+
+       Moments moments = Imgproc.moments(largestContour);
 
 
 
 
-
-
-
-       MatOfPoint largestContour = null; // Variable to store the largest contour found
+       // Variable to store the largest contour found
        // Iterate through all contours to find the one with the largest area (closest ball)
        for (MatOfPoint contour : allContours) {
            double area = Imgproc.contourArea(contour);
@@ -127,14 +134,22 @@ public class DriveAndIntake {
            }
        }
        // If a valid contour is found, calculate its center position
+       //redundancy just to make sure
        if (largestContour != null) {
-           Moments moments = Imgproc.moments(largestContour);
+           moments = Imgproc.moments(largestContour);
            if (moments.get_m00() != 0) {
                centerX =  (int) ( moments.get_m10() / moments.get_m00());
                centerY = (int) (moments.get_m01() / moments.get_m00());
            }
+           else if (moments.get_m00() == 0) {
+               centerX= 0;
+               centerY = 0;
+           }
+       } else if (largestContour == null) {
+           centerX = 0;
+           centerY = 0;
        }
-       double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+       currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
 
 
 

@@ -533,25 +533,29 @@ public class DecodeAutonomous extends LinearOpMode {
                // Navigation phase: drive to the designated ball collection area
                //driveToBallRow(currentRowIndex);
 
-               List<MatOfPoint> contours = pipeline.getAllContours();
+                //instance with constructor so opmode knows what motors to use
+                driveAndIntake = new DriveAndIntake(
+                );
+
+                List<MatOfPoint> contours = pipeline.getAllContours();
                if (contours != null && !contours.isEmpty()) {
                     driveAndIntake.driveToBall(contours, 640, 480);
                }
                
-               //instance with constructor so opmode knows what motors to use
-               driveAndIntake = new DriveAndIntake(
-               );
+
+
+               int ballX = driveAndIntake.getCenterX();
 
                Point frameCenter = new Point(driveAndIntake.camWidth / 2, driveAndIntake.camHeight / 2);
                int camCenterX = driveAndIntake.camWidth / 2;
 
                //align ball's x value with frame's x value
-                if (driveAndIntake.centerX != camCenterX-driveAndIntake.offset) {
+                if (ballX != camCenterX-driveAndIntake.offset) {
                     frontLeftMotor.setPower(0.2);
                     backLeftMotor.setPower(0.2);
                     frontRightMotor.setPower(-0.2);
                     backRightMotor.setPower(-0.2);
-                    if (driveAndIntake.centerX == camCenterX) {
+                    if (ballX == camCenterX) {
                         frontLeftMotor.setPower(0);
                         backLeftMotor.setPower(0);
                         frontRightMotor.setPower(0);
