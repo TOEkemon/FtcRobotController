@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;  // Add this import
@@ -182,6 +183,8 @@ public class DecodeAutonomous extends LinearOpMode {
    private DcMotor shooterMotor;
    private DcMotor wheelRotationMotor;
    private DcMotor kickerMotor;
+   private Servo grip_servo_left;  // Left gripper servo
+   private Servo grip_servo_right; // Right gripper servo
    private ColorSensor colorSensor;
    private IMU imu;
    private WebcamName webcam;
@@ -314,7 +317,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
        // Now initialize controllers with the properly initialized hardware
        barrelController = new BarrelController(wheelRotationMotor, colorSensor);
-       shooterController = new ShooterController(shooterMotor, kickerMotor);
+       shooterController = new ShooterController(shooterMotor, kickerMotor, grip_servo_left, grip_servo_right);
        visionProcessor = new AprilTagVisionProcessor();
        ballDetector = pipeline;
 
@@ -414,6 +417,11 @@ public class DecodeAutonomous extends LinearOpMode {
        // Motors
        wheelRotationMotor = hardwareMap.get(DcMotor.class, "wheel_rotation");
        kickerMotor = hardwareMap.get(DcMotor.class, "kicker_motor");
+
+
+       // Servos
+       grip_servo_left = hardwareMap.get(Servo.class, "grip_servo_left");  // Initialize left gripper servo
+       grip_servo_right = hardwareMap.get(Servo.class, "grip_servo_right"); // Initialize right gripper servo
 
 
        // Sensors

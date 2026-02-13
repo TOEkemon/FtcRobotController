@@ -13,6 +13,8 @@ public class ShooterController {
     // Hardware components
     private DcMotor shooterMotor;
     private DcMotor kickerMotor;
+    private Servo grip_servo_left;  // Left gripper servo
+    private Servo grip_servo_right; // Right gripper servo
     
     // Constants for shooting timing
     private static final double BALL_PUSH_DURATION = 0.5; // seconds to push ball
@@ -28,30 +30,72 @@ public class ShooterController {
      * Constructor for ShooterController
      * @param shooterMotor The motor that spins the shooter wheel
      * @param kickerMotor The servo that pushes balls into the shooter
+     * @param grip_servo_left Left gripper servo
+     * @param grip_servo_right Right gripper servo
      */
-    public ShooterController(DcMotor shooterMotor, DcMotor kickerMotor) {
+    public ShooterController(DcMotor shooterMotor, DcMotor kickerMotor, Servo grip_servo_left, Servo grip_servo_right) {
         this.shooterMotor = shooterMotor;
         this.kickerMotor = kickerMotor;
+        this.grip_servo_left = grip_servo_left;
+        this.grip_servo_right = grip_servo_right;
 
         // Initialize servos to default positions if not null
         if (kickerMotor != null) {
             kickerMotor.setPower(0.0); // Retracted position
         }
+        if (grip_servo_left != null) {
+            grip_servo_left.setPosition(0.5); // Neutral position
+        }
+        if (grip_servo_right != null) {
+            grip_servo_right.setPosition(0.5); // Neutral position
+        }
     }
     
     /**
-     * Starts the shooter motor
+     * Starts the shooter motor and moves gripper servos to forward shooting position
      */
     public void startShooter() {
         // Set the shooter motor to run at full power
         shooterMotor.setPower(1.0);
+        
+        // Move gripper servos to forward shooting position (left to 1.0, right to 0.0)
+        if (grip_servo_left != null) {
+            grip_servo_left.setPosition(1.0);
+        }
+        if (grip_servo_right != null) {
+            grip_servo_right.setPosition(0.0);
+        }
     }
     
     /**
-     * Stops the shooter motor
+     * Starts the shooter motor in reverse and moves gripper servos to backward shooting position
+     */
+    public void startShooterReverse() {
+        // Set the shooter motor to run in reverse at full power
+        shooterMotor.setPower(-1.0);
+        
+        // Move gripper servos to backward shooting position (left to 0.0, right to 1.0)
+        if (grip_servo_left != null) {
+            grip_servo_left.setPosition(0.0);
+        }
+        if (grip_servo_right != null) {
+            grip_servo_right.setPosition(1.0);
+        }
+    }
+
+    /**
+     * Stops the shooter motor and moves gripper servos to neutral position
      */
     public void stopShooter() {
         shooterMotor.setPower(0.0);
+        
+        // Move gripper servos to neutral position when stopping shooter
+        if (grip_servo_left != null) {
+            grip_servo_left.setPosition(0.5);
+        }
+        if (grip_servo_right != null) {
+            grip_servo_right.setPosition(0.5);
+        }
     }
     
     /**
