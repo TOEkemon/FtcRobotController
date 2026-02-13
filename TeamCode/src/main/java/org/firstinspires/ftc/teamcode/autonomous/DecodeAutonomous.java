@@ -181,7 +181,7 @@ public class DecodeAutonomous extends LinearOpMode {
    private DcMotor backRightMotor;
    private DcMotorEx intakeMotor;
    private DcMotor shooterMotor;
-   private Servo wheelRotationServo;
+   private Servo wheelRotationMotor;
    private DcMotor kickerMotor;
    private ColorSensor colorSensor;
    private IMU imu;
@@ -314,7 +314,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        // Now initialize controllers with the properly initialized hardware
-       barrelController = new BarrelController(wheelRotationServo, colorSensor);
+       barrelController = new BarrelController(wheelRotationMotor, colorSensor);
        shooterController = new ShooterController(shooterMotor, kickerMotor);
        visionProcessor = new AprilTagVisionProcessor();
        ballDetector = pipeline;
@@ -413,7 +413,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        // Servos
-       wheelRotationServo = hardwareMap.get(Servo.class, "wheel_rotation");
+       wheelRotationMotor = hardwareMap.get(Servo.class, "wheel_rotation");
        kickerMotor = hardwareMap.get(DcMotor.class, "kicker_motor");
 
 
