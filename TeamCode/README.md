@@ -47,7 +47,7 @@ The system sorts balls based on the detected AprilTag pattern:
 - Drive Motors: front_left_motor, front_right_motor, back_left_motor, back_right_motor
 - Intake Motor: intake_motor
 - Shooter Motor: shooter_motor
-- Servos: wheel_rotation (for barrel), ball_push (for shooting)
+- Motors: wheel_rotation (for barrel), kicker_motor (for shooting)
 - Sensors: color_sensor
 - Camera: Webcam 1
 

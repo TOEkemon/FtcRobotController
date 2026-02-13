@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;  // Add this import
@@ -181,7 +180,7 @@ public class DecodeAutonomous extends LinearOpMode {
    private DcMotor backRightMotor;
    private DcMotorEx intakeMotor;
    private DcMotor shooterMotor;
-   private Servo wheelRotationMotor;
+   private DcMotor wheelRotationMotor;
    private DcMotor kickerMotor;
    private ColorSensor colorSensor;
    private IMU imu;
@@ -412,8 +411,8 @@ public class DecodeAutonomous extends LinearOpMode {
        shooterMotor = hardwareMap.get(DcMotor.class, "shooter_motor");
 
 
-       // Servos
-       wheelRotationMotor = hardwareMap.get(Servo.class, "wheel_rotation");
+       // Motors
+       wheelRotationMotor = hardwareMap.get(DcMotor.class, "wheel_rotation");
        kickerMotor = hardwareMap.get(DcMotor.class, "kicker_motor");
 
 
