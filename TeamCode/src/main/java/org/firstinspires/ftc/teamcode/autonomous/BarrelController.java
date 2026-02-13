@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 
 /**
  * BarrelController handles the barrel rotation and ball sorting logic.
@@ -23,7 +22,6 @@ public class BarrelController {
 
     // Hardware components
     private DcMotor wheelRotationMotor;
-    private ColorSensor colorSensor;
 
     // State tracking
     private int currentBallIndex = 0;  // Index of the next ball to store
@@ -32,11 +30,9 @@ public class BarrelController {
     /**
      * Constructor for BarrelController
      * @param wheelRotationMotor The motor controlling barrel rotation
-     * @param colorSensor The color sensor for detecting ball colors
      */
-    public BarrelController(DcMotor wheelRotationMotor, ColorSensor colorSensor) {
+    public BarrelController(DcMotor wheelRotationMotor) {
         this.wheelRotationMotor = wheelRotationMotor;
-        this.colorSensor = colorSensor;
         
         // Configure the motor for position control
         this.wheelRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -130,31 +126,14 @@ public class BarrelController {
     }
     
     /**
-     * Detects the color of the ball using the color sensor
+     * Detects the color of the ball using camera-based detection (handled externally)
      * @return The detected color as a string ("PURPLE", "GREEN", etc.)
      */
     public String detectBallColor() {
-        // This is a simplified color detection - in practice, you'd use the actual color values
-        // from the color sensor to determine the color
-        int red = colorSensor.red();
-        int green = colorSensor.green();
-        int blue = colorSensor.blue();
-
-        // For DECODE game, we need to detect purple and green balls
-        // Purple has high red and blue, green has high green
-        // Need to account for lighting conditions and sensor sensitivity
-
-        // Simple color detection logic for purple vs green
-        // Purple: high red and blue compared to green
-        // Green: high green compared to red and blue
-        if (red > green && blue > green && (red + blue) > (green * 1.5)) {
-            return "PURPLE";
-        } else if (green > red && green > blue) {
-            return "GREEN";
-        } else {
-            // If no clear dominant color, return a default
-            return "UNKNOWN";
-        }
+        // This method is kept for compatibility with the existing interface
+        // Actual color detection is handled by the camera system in the main autonomous class
+        // Return UNKNOWN since color detection is done externally
+        return "UNKNOWN";
     }
 
     /**

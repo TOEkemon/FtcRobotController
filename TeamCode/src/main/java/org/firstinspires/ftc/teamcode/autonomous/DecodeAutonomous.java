@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;  // Add this import
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;  // Add this import
@@ -27,6 +26,11 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.firstinspires.ftc.teamcode.autonomous.BalldentifierAndDriver;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -185,9 +189,13 @@ public class DecodeAutonomous extends LinearOpMode {
    private DcMotor kickerMotor;
    private Servo grip_servo_left;  // Left gripper servo
    private Servo grip_servo_right; // Right gripper servo
-   private ColorSensor colorSensor;
    private IMU imu;
    private WebcamName webcam;
+   private WebcamName webcam2; // Secondary camera for intake detection
+   
+   // Camera selection variables
+   private static final boolean USE_WEBCAM_2_FOR_INTAKE = false; // Change this to switch cameras
+   private WebcamName intakeCamera; // Will point to either webcam or webcam2
 
 
    // Vision portals for different tasks
@@ -195,12 +203,12 @@ public class DecodeAutonomous extends LinearOpMode {
    // Note: Ball detection will use the color sensor instead of camera vision for sorting
 
 
-
-
-
-
    private OpenCvCamera camera;
    private BalldentifierAndDriver pipeline;
+   
+   // Vision portal for intake area color detection
+   private VisionPortal intakeVisionPortal;
+   private IntakeColorDetectionPipeline intakeColorPipeline;
 
 
 
@@ -259,10 +267,9 @@ public class DecodeAutonomous extends LinearOpMode {
 
        //telemetry to calculate offset of ball center and cam center
        telemetry.addData("centerX: ", driveAndIntake.centerX);
-       telemetry.addData("centerY: ", driveAndIntake.centerY); 
+       telemetry.addData("centerY: ", driveAndIntake.centerY);
        telemetry.addData("camCenterX: ", driveAndIntake.camCenterX);
        telemetry.addData("camCenterY: ", driveAndIntake.camCenterY);
-       telemetry.addData("color: ", driveAndIntake.intakeAreaRed + ", " + driveAndIntake.intakeAreaGreen + ", " + driveAndIntake.intakeAreaBlue);
        telemetry.addData("Current Draw",driveAndIntake.currentDraw);
        telemetry.update();
 
@@ -316,10 +323,24 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        // Now initialize controllers with the properly initialized hardware
-       barrelController = new BarrelController(wheelRotationMotor, colorSensor);
+       barrelController = new BarrelController(wheelRotationMotor);
        shooterController = new ShooterController(shooterMotor, kickerMotor, grip_servo_left, grip_servo_right);
        visionProcessor = new AprilTagVisionProcessor();
        ballDetector = pipeline;
+       
+       // Initialize intake area color detection vision system
+       try {
+           intakeColorPipeline = new IntakeColorDetectionPipeline();
+           VisionPortal.Builder intakeVisionBuilder = new VisionPortal.Builder();
+           intakeVisionBuilder.setCamera(intakeCamera);
+           intakeVisionBuilder.addProcessor(intakeColorPipeline);
+           intakeVisionPortal = intakeVisionBuilder.build();
+       } catch (Exception e) {
+           // If vision system fails to initialize, log it but continue
+           telemetry.addData("Warning", "Intake vision system failed to initialize: " + e.getMessage());
+           intakeVisionPortal = null;
+           intakeColorPipeline = null;
+       }
 
 
        // Initialize the vision processor with the webcam
@@ -387,10 +408,116 @@ public class DecodeAutonomous extends LinearOpMode {
        if (aprilTagVisionPortal != null) {
            aprilTagVisionPortal.close();
        }
+       if (intakeVisionPortal != null) {
+           intakeVisionPortal.close();
+       }
        shooterController.stopShooter();
    }
 
 
+   // Custom OpenCV Pipeline for intake area color detection
+   class IntakeColorDetectionPipeline extends OpenCvPipeline {
+       // Define the region of interest (ROI) for the intake area
+       // These coordinates define the area where balls enter the intake
+       private static final int ROI_X = 200;  // X coordinate of ROI top-left corner
+       private static final int ROI_Y = 300;  // Y coordinate of ROI top-left corner
+       private static final int ROI_WIDTH = 240;  // Width of ROI
+       private static final int ROI_HEIGHT = 140; // Height of ROI
+       
+       // Color thresholds for detecting purple and green balls in HSV space
+       private static final Scalar PURPLE_HSV_MIN = new Scalar(125, 50, 50);
+       private static final Scalar PURPLE_HSV_MAX = new Scalar(150, 255, 255);
+       private static final Scalar GREEN_HSV_MIN = new Scalar(40, 50, 50);
+       private static final Scalar GREEN_HSV_MAX = new Scalar(80, 255, 255);
+       
+       // Internal Mats for processing
+       private Mat hsvMat = new Mat();
+       private Mat roiMat = new Mat();
+       private Mat purpleMask = new Mat();
+       private Mat greenMask = new Mat();
+       private Mat combinedMask = new Mat();
+       private Mat outputMat = new Mat();
+       
+       // Variables to store detection results
+       private boolean ballDetected = false;
+       private String detectedColor = "NONE"; // "PURPLE", "GREEN", or "NONE"
+       private double confidence = 0.0; // Confidence level of detection
+       
+       @Override
+       public Mat processFrame(Mat inputMat) {
+           // Create a copy of the input for output
+           inputMat.copyTo(outputMat);
+           
+           // Define the region of interest (ROI) where the intake is located
+           Rect roi = new Rect(ROI_X, ROI_Y, ROI_WIDTH, ROI_HEIGHT);
+           
+           // Extract the ROI from the input image
+           roiMat = new Mat(inputMat, roi);
+           
+           // Convert ROI to HSV for better color detection
+           Imgproc.cvtColor(roiMat, hsvMat, Imgproc.COLOR_RGB2HSV);
+           
+           // Create masks for purple and green colors
+           Core.inRange(hsvMat, PURPLE_HSV_MIN, PURPLE_HSV_MAX, purpleMask);
+           Core.inRange(hsvMat, GREEN_HSV_MIN, GREEN_HSV_MAX, greenMask);
+           
+           // Combine the masks
+           Core.bitwise_or(purpleMask, greenMask, combinedMask);
+           
+           // Calculate the percentage of pixels that match the target colors
+           double purplePercentage = (double) Core.countNonZero(purpleMask) / (roiMat.rows() * roiMat.cols());
+           double greenPercentage = (double) Core.countNonZero(greenMask) / (roiMat.rows() * roiMat.cols());
+           
+           // Determine if a ball is detected based on color coverage
+           double colorThreshold = 0.10; // 10% of pixels must be colored to detect a ball
+           ballDetected = (purplePercentage > colorThreshold || greenPercentage > colorThreshold);
+           
+           // Determine the detected color based on which color has higher percentage
+           if (ballDetected) {
+               if (purplePercentage > greenPercentage) {
+                   detectedColor = "PURPLE";
+                   confidence = purplePercentage;
+               } else {
+                   detectedColor = "GREEN";
+                   confidence = greenPercentage;
+               }
+           } else {
+               detectedColor = "NONE";
+               confidence = 0.0;
+           }
+           
+           // Draw ROI rectangle on the output image
+           Imgproc.rectangle(outputMat, roi.tl(), roi.br(), new Scalar(0, 255, 0), 2);
+           
+           // Add text overlay with detection results
+           String detectionText = "Ball: " + (ballDetected ? detectedColor : "NO") + 
+                                " (" + String.format("%.1f%%", confidence * 100) + ")";
+           Imgproc.putText(outputMat, detectionText, new Point(10, 30),
+                          Imgproc.FONT_HERSHEY_SIMPLEX, 0.8, new Scalar(255, 255, 255), 2);
+           
+           // Release temporary mats to prevent memory leaks
+           roiMat.release();
+           hsvMat.release();
+           purpleMask.release();
+           greenMask.release();
+           combinedMask.release();
+           
+           return outputMat;
+       }
+       
+       public boolean isBallDetected() {
+           return ballDetected;
+       }
+       
+       public String getDetectedColor() {
+           return detectedColor;
+       }
+       
+       public double getConfidence() {
+           return confidence;
+       }
+   }
+   
    /**
     * Initializes all hardware components
     */
@@ -425,9 +552,24 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        // Sensors
-       colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");
        imu = hardwareMap.get(IMU.class, "imu");  // IMU is typically configured as "imu" in the robot configuration
        webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+       
+       // Initialize secondary camera for intake detection
+       try {
+           webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+       } catch (Exception e) {
+           // If Webcam 2 is not available, log it but continue
+           telemetry.addData("Warning", "Webcam 2 not found, using fallback methods");
+           webcam2 = null;
+       }
+       
+       // Select intake camera based on the flag
+       if (USE_WEBCAM_2_FOR_INTAKE && webcam2 != null) {
+           intakeCamera = webcam2;
+       } else {
+           intakeCamera = webcam; // Fallback to Webcam 1
+       }
    }
 
 
@@ -541,6 +683,7 @@ public class DecodeAutonomous extends LinearOpMode {
                //driveToBallRow(currentRowIndex);
 
                 //instance with constructor so opmode knows what motors to use
+                // Note: DriveAndIntake constructor has been updated to not require color sensor
                 driveAndIntake = new DriveAndIntake(
                 );
 
@@ -1126,27 +1269,28 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
    /**
-    * Checks if a ball is detected by the color sensor
+    * Checks if a ball is detected by the intake camera vision system (primary)
     * @return true if a ball is detected, false otherwise
     */
    private boolean isBallDetectedByColorSensor() {
-       // Check if the color sensor detects a ball
-       // This is a simplified check - in practice, you'd have more sophisticated detection
-       // based on color intensity or proximity sensor values
-       if (colorSensor != null) {
-           int red = colorSensor.red();
-           int green = colorSensor.green();
-           int blue = colorSensor.blue();
-
-
-           // A ball is detected if the color values exceed a threshold
-           // This threshold may need tuning based on your robot's setup
-           int totalColor = red + green + blue;
-           return totalColor > 50; // Adjust threshold as needed
+       // Primary method: Check if the intake camera vision system detects a ball
+       if (intakeColorPipeline != null) {
+           try {
+               boolean cameraDetection = intakeColorPipeline.isBallDetected();
+               // Add telemetry for camera detection
+               telemetry.addData("Intake Cam Detection", cameraDetection ? intakeColorPipeline.getDetectedColor() : "NO BALL");
+               telemetry.addData("Intake Cam Confidence", "%.2f", intakeColorPipeline.getConfidence());
+               
+               return cameraDetection;
+           } catch (Exception e) {
+               telemetry.addData("Camera Detection Error", e.getMessage());
+               // If there's an error in camera detection, return false
+               return false;
+           }
        }
-
-
-       // If color sensor is not available, return false
+       
+       // If camera system is not available, return false
+       telemetry.addData("Detection System", "Camera system unavailable");
        return false;
    }
 
@@ -1162,21 +1306,42 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
    /**
-    * Sorts a ball based on color sensor detection
+    * Sorts a ball based on camera-based color detection (primary)
     */
    private void sortBallWithColorSensor() {
-       // Detect the color of the incoming ball if barrel controller is available
+       // Detect the color of the incoming ball using camera-based detection (primary)
        String detectedColor = null;
-       if (barrelController != null) {
-           detectedColor = barrelController.detectBallColor();
-
-
-           // Store the ball in the appropriate slot based on the target pattern if available
-           if (targetPattern != null) {
-               int slot = barrelController.storeBall(targetPattern, ballsCollected % 3); // Use modulo to cycle through pattern
+       
+       // Primary method: Use camera-based detection
+       if (intakeColorPipeline != null) {
+           try {
+               if (intakeColorPipeline.isBallDetected()) {
+                   detectedColor = intakeColorPipeline.getDetectedColor();
+                   telemetry.addData("Camera Ball Detection", detectedColor);
+                   telemetry.addData("Camera Confidence", "%.2f", intakeColorPipeline.getConfidence());
+               }
+           } catch (Exception e) {
+               telemetry.addData("Camera Detection Error", e.getMessage());
            }
        }
-
+       
+       // Store the ball in the appropriate slot based on the target pattern if available
+       if (targetPattern != null && detectedColor != null && !detectedColor.equals("UNKNOWN") && !detectedColor.equals("NONE")) {
+           if (barrelController != null) {
+               int slot = barrelController.storeBall(targetPattern, ballsCollected % 3); // Use modulo to cycle through pattern
+               telemetry.addData("Ball Stored in Slot", slot);
+           }
+       } else {
+           telemetry.addData("Ball Detection", "Failed - Color: " + detectedColor);
+           
+           // If we couldn't detect the color, we can still store the ball in the next available slot
+           // This ensures the robot continues operating even if color detection fails
+           if (barrelController != null) {
+               // Store in the next available slot regardless of color (for compatibility)
+               int slot = barrelController.storeBall(targetPattern, ballsCollected % 3);
+               telemetry.addData("Ball Stored in Slot (unknown color)", slot);
+           }
+       }
 
        // Wait for the ball to be properly positioned
        sleep(500);
@@ -1455,6 +1620,19 @@ public class DecodeAutonomous extends LinearOpMode {
        }
 
 
+       // Add intake camera detection information to telemetry
+       if (intakeColorPipeline != null) {
+           try {
+               telemetry.addData("Intake Cam Ball", intakeColorPipeline.isBallDetected() ? intakeColorPipeline.getDetectedColor() : "NO");
+               telemetry.addData("Intake Cam Confidence", "%.2f", intakeColorPipeline.getConfidence());
+           } catch (Exception e) {
+               telemetry.addData("Intake Cam Error", e.getMessage());
+           }
+       } else {
+           telemetry.addData("Intake Cam", "Not initialized");
+       }
+
+
        // Add IMU data to telemetry
        if (imu != null) {
            try {
@@ -1468,6 +1646,11 @@ public class DecodeAutonomous extends LinearOpMode {
        } else {
            telemetry.addData("IMU", "Not initialized");
        }
+
+
+       // Add camera selection information
+       telemetry.addData("Active Intake Cam", USE_WEBCAM_2_FOR_INTAKE ? "Webcam 2" : "Webcam 1");
+       telemetry.addData("Webcam 2 Available", webcam2 != null ? "YES" : "NO");
 
 
        telemetry.addData("Current State", currentState.toString());

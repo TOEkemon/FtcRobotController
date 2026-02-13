@@ -49,8 +49,8 @@ The system sorts balls based on the detected AprilTag pattern:
 - Shooter Motor: shooter_motor
 - Motors: wheel_rotation (for barrel), kicker_motor (for shooting)
 - Servos: grip_servo_left, grip_servo_right (for grippers)
-- Sensors: color_sensor
-- Camera: Webcam 1
+- Sensors: imu
+- Cameras: Webcam 1, Webcam 2
 
 ## Constraints
 

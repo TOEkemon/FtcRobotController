@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -37,7 +36,6 @@ public class DriveAndIntake {
    private DcMotor shooterMotor;
    private Servo wheelRotationServo;
    private Servo ballPushServo;
-   private ColorSensor  colorSensor;
    private IMU imu;
    private WebcamName webcam;
 
@@ -61,9 +59,9 @@ public class DriveAndIntake {
 
 
 
-   int intakeAreaRed = colorSensor.red();
-   int intakeAreaGreen = colorSensor.green();
-   int intakeAreaBlue = colorSensor.blue();
+   // Use camera-based detection instead of color sensor
+   // These values will be updated based on camera analysis in the main loop
+   // For now, we'll use the camera pipeline's detection results
 
    //find offset trough physcial testing
    int offset = 39;
@@ -90,15 +88,13 @@ public class DriveAndIntake {
            DcMotor fr,
            DcMotor bl,
            DcMotor br,
-           DcMotorEx intake,
-           ColorSensor colorSensor
+           DcMotorEx intake
    ) {
        this.frontLeftMotor = fl;
        this.frontRightMotor = fr;
        this.backLeftMotor = bl;
        this.backRightMotor = br;
        this.intakeMotor = intake;
-       this.colorSensor = colorSensor;
    }*/
 
 
@@ -175,17 +171,14 @@ public class DriveAndIntake {
 
            }
        }
-       // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
-       intakeAreaRed = colorSensor.red();
-       intakeAreaGreen = colorSensor.green();
-       intakeAreaBlue = colorSensor.blue();
+       // move towards ball until it is taken in, which will be detected by current draw increase
        //when ball taken in, amp draw will increase, so use that as threshold to stop driving forward and stop intake
        intakeMotor.setPower(1);
        currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
        if (currentDraw < 1.1) { // Adjust the threshold as needed based on testing
               currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
-             
-              
+
+
               frontLeftMotor.setPower(0.5);
               backLeftMotor.setPower(0.5);
               frontRightMotor.setPower(0.5);
