@@ -44,7 +44,7 @@ public class offsetTest extends LinearOpMode{
     private int centerY = 0;  // Added missing centerY declaration
 
 
-    private BallDetectionPipeline pipeline; // Standalone pipeline instead of BalldentifierAndDriver
+    private org.firstinspires.ftc.teamcode.autonomous.BalldentifierAndDriver pipeline; // Use existing pipeline
 
     private void initializeHardware() {
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intake_motor");
@@ -59,8 +59,8 @@ public class offsetTest extends LinearOpMode{
         initializeHardware();
 
 
-        // Create our custom standalone pipeline
-        pipeline = new BallDetectionPipeline();
+        // Create our pipeline using existing BalldentifierAndDriver
+        pipeline = new org.firstinspires.ftc.teamcode.autonomous.BalldentifierAndDriver();
 
         int camCenterX = 320;
         int camCenterY = 240;

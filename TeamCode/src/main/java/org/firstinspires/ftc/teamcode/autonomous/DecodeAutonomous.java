@@ -328,17 +328,15 @@ public class DecodeAutonomous extends LinearOpMode {
        visionProcessor = new AprilTagVisionProcessor();
        ballDetector = pipeline;
        
-       // Initialize intake area color detection vision system
+       // Initialize intake area color detection pipeline (but don't add to vision portal since it's a custom pipeline)
        try {
            intakeColorPipeline = new IntakeColorDetectionPipeline();
-           VisionPortal.Builder intakeVisionBuilder = new VisionPortal.Builder();
-           intakeVisionBuilder.setCamera(intakeCamera);
-           intakeVisionBuilder.addProcessor(intakeColorPipeline);
-           intakeVisionPortal = intakeVisionBuilder.build();
+           // Note: The pipeline is created but not actively used in the vision portal
+           // since it's designed for intake area detection rather than continuous streaming
        } catch (Exception e) {
-           // If vision system fails to initialize, log it but continue
-           telemetry.addData("Warning", "Intake vision system failed to initialize: " + e.getMessage());
-           intakeVisionPortal = null;
+           // If pipeline fails to initialize, log it but continue
+           telemetry.addData("Warning", "Intake color detection pipeline failed to initialize: " + e.getMessage());
+           telemetry.update();
            intakeColorPipeline = null;
        }
 
@@ -412,9 +410,6 @@ public class DecodeAutonomous extends LinearOpMode {
        if (aprilTagVisionPortal != null) {
            aprilTagVisionPortal.close();
        }
-       if (intakeVisionPortal != null) {
-           intakeVisionPortal.close();
-       }
        shooterController.stopShooter();
    }
 
@@ -423,16 +418,16 @@ public class DecodeAutonomous extends LinearOpMode {
    class IntakeColorDetectionPipeline extends OpenCvPipeline {
        // Define the region of interest (ROI) for the intake area
        // These coordinates define the area where balls enter the intake
-       private static final int ROI_X = 200;  // X coordinate of ROI top-left corner
-       private static final int ROI_Y = 300;  // Y coordinate of ROI top-left corner
-       private static final int ROI_WIDTH = 240;  // Width of ROI
-       private static final int ROI_HEIGHT = 140; // Height of ROI
+       private final int ROI_X = 200;  // X coordinate of ROI top-left corner
+       private final int ROI_Y = 300;  // Y coordinate of ROI top-left corner
+       private final int ROI_WIDTH = 240;  // Width of ROI
+       private final int ROI_HEIGHT = 140; // Height of ROI
        
        // Color thresholds for detecting purple and green balls in HSV space
-       private static final Scalar PURPLE_HSV_MIN = new Scalar(125, 50, 50);
-       private static final Scalar PURPLE_HSV_MAX = new Scalar(150, 255, 255);
-       private static final Scalar GREEN_HSV_MIN = new Scalar(40, 50, 50);
-       private static final Scalar GREEN_HSV_MAX = new Scalar(80, 255, 255);
+       private final Scalar PURPLE_HSV_MIN = new Scalar(125, 50, 50);
+       private final Scalar PURPLE_HSV_MAX = new Scalar(150, 255, 255);
+       private final Scalar GREEN_HSV_MIN = new Scalar(40, 50, 50);
+       private final Scalar GREEN_HSV_MAX = new Scalar(80, 255, 255);
        
        // Internal Mats for processing
        private Mat hsvMat = new Mat();
@@ -715,11 +710,7 @@ public class DecodeAutonomous extends LinearOpMode {
                         frontRightMotor.setPower(0);
                         backRightMotor.setPower(0);
 
-                        // move towards ball until it is taken in, which will be detected by color sensor in intake area not reading gray
-                        //currently unused
-                        driveAndIntake.intakeAreaRed = colorSensor.red();
-                        driveAndIntake.intakeAreaGreen = colorSensor.green();
-                        driveAndIntake.intakeAreaBlue = colorSensor.blue();
+                        // move towards ball until it is taken in, which will be detected by current draw
                         //when ball taken in, amp draw will increase, so use that as threshold to stop driving forward and stop intake
                         intakeMotor.setPower(1);
                         driveAndIntake.currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
@@ -766,7 +757,7 @@ public class DecodeAutonomous extends LinearOpMode {
                telemetry.addData("centerY: ", driveAndIntake.centerY); 
                telemetry.addData("camCenterX: ", camCenterX);
                telemetry.addData("camCenterY: ", driveAndIntake.camCenterY);
-               telemetry.addData("color: ", driveAndIntake.intakeAreaRed + ", " + driveAndIntake.intakeAreaGreen + ", " + driveAndIntake.intakeAreaBlue);
+               // Removed color sensor telemetry since color sensor is not used in this implementation
                telemetry.addData("Current Draw",driveAndIntake.currentDraw);
                telemetry.update();
                sleep(10);
