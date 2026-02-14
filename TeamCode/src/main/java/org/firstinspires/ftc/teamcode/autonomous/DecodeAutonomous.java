@@ -349,30 +349,34 @@ public class DecodeAutonomous extends LinearOpMode {
        }
 
 
-       // Wait for start with alliance selection
+       // Wait for start with single-button alliance and side selection
        telemetry.addData(">", "Press Play to start autonomous");
-       telemetry.addData("Alliance", "Press A for Red, B for Blue");
-       telemetry.addData("Side", "Press X for Near, Y for Far");
+       telemetry.addData("Starting Position", "Press A for Red-Far, B for Blue-Far");
+       telemetry.addData("", "Press X for Red-Near, Y for Blue-Near");
        telemetry.update();
 
 
-       // Alliance selection during init
+       // Single-button selection during init
        while (opModeInInit()) {
            if (gamepad1.a) {
                isRedAlliance = true;
-               telemetry.addData("Selected", "Red Alliance");
+               isNearSide = false; // Far side
+               telemetry.addData("Selected", "Red-Far");
            } else if (gamepad1.b) {
-               isRedAlliance = false;
-               telemetry.addData("Selected", "Blue Alliance");
-           }
-
-
-           if (gamepad1.x) {
-               isNearSide = true;
-               telemetry.addData("Selected", "Near Side");
+               isRedAlliance = false; // Blue alliance
+               isNearSide = false; // Far side
+               telemetry.addData("Selected", "Blue-Far");
+           } else if (gamepad1.x) {
+               isRedAlliance = true;
+               isNearSide = true; // Near side
+               telemetry.addData("Selected", "Red-Near");
            } else if (gamepad1.y) {
-               isNearSide = false;
-               telemetry.addData("Selected", "Far Side");
+               isRedAlliance = false; // Blue alliance
+               isNearSide = true; // Near side
+               telemetry.addData("Selected", "Blue-Near");
+           } else {
+               // Show default message if no button pressed yet
+               telemetry.addData("Current Selection", "None - Press A, B, X, or Y");
            }
 
 
@@ -1653,13 +1657,24 @@ public class DecodeAutonomous extends LinearOpMode {
        telemetry.addData("Webcam 2 Available", webcam2 != null ? "YES" : "NO");
 
 
+       // Add starting position information
+       String startPosition = "";
+       if (isRedAlliance && isNearSide) {
+           startPosition = "Red-Near";
+       } else if (isRedAlliance && !isNearSide) {
+           startPosition = "Red-Far";
+       } else if (!isRedAlliance && isNearSide) {
+           startPosition = "Blue-Near";
+       } else {
+           startPosition = "Blue-Far";
+       }
+       telemetry.addData("Starting Position", startPosition);
+
+
        telemetry.addData("Current State", currentState.toString());
        telemetry.addData("Balls Collected", ballsCollected);
        telemetry.addData("Target Pattern", targetPattern != null ?
                targetPattern[0] + ", " + targetPattern[1] + ", " + targetPattern[2] : "Not detected");
-       telemetry.addData("Alliance", isRedAlliance ? "Red" : "Blue");
-       telemetry.addData("Side", isNearSide ? "Near" : "Far");
-       telemetry.addData("Time Elapsed", (System.currentTimeMillis() - startTime) / 1000.0);
        telemetry.update();
    }
 }
