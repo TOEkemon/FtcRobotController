@@ -231,19 +231,20 @@ public class tele_op_new_robot extends LinearOpMode {
       if (!gamepad1.b) bPressed = false;
       if (!gamepad1.y) yPressed = false;
 
-      //inertia for ball to be at trigger
+      //inertia for ball to be at trigger 
+      //need to adjust time for motors on
       if (front_left_motor != null && front_right_motor != null && back_left_motor != null && back_right_motor != null) {
           if (gamepad1.right_bumper && !rightBumperPressed) {
              front_left_motor.setPower(-1); // go back to push ball
              front_right_motor.setPower(-1); 
              back_left_motor.setPower(-1);
              back_right_motor.setPower(-1);
-             sleep(50);
+             sleep(150);
              front_left_motor.setPower(0); // go forward to move ball t rtigger
              front_right_motor.setPower(0); 
              back_left_motor.setPower(0);
              back_right_motor.setPower(0);
-             sleep(50);
+             sleep(150);
 
           }
       }
