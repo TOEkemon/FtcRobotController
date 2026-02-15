@@ -254,13 +254,13 @@ public class tele_op_new_robot extends LinearOpMode {
       if (shooter_motor != null) {
           if (rightTriggerPressed && !lastRightTriggerPressed) {
               // Right trigger pressed (and wasn't pressed before) - run shooter forward at 100%
-              shooter_motor.setPower(0.8);
+              shooter_motor.setPower(1);
               // Also move gripper servos: left to 1.0, right to 0.0
               if (grip_servo_left != null) grip_servo_left.setPosition(1.0);
               if (grip_servo_right != null) grip_servo_right.setPosition(0.0);
           } else if (leftTriggerPressed && !lastLeftTriggerPressed) {
               // Left trigger pressed (and wasn't pressed before) - run shooter backward at 100%
-              shooter_motor.setPower(-0.8);
+              shooter_motor.setPower(-1);
               // Also move gripper servos: left to 0.0, right to 1.0
               if (grip_servo_left != null) grip_servo_left.setPosition(0.0);
               if (grip_servo_right != null) grip_servo_right.setPosition(1.0);
