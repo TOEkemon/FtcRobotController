@@ -168,6 +168,12 @@ public class SimpleAutonomous extends LinearOpMode {
     private void runRedFarAutonomous() {
         // Initial actions
         // Drive backward 40 inches
+        if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+        }
         currentAction = "Moving to Launch Line";
         driveDistance(-40.0, 0.5);  // Negative distance = backward
 
@@ -199,6 +205,23 @@ public class SimpleAutonomous extends LinearOpMode {
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
+                }
+            }
+            sleep(200); // Wait for retraction//gripper needs to rotate while kicker motor pushes ball?
+            
+            if (kicker_motor != null) {
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(0.8);  // Activate kicker motor
+                
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                
                 }
             }
             sleep(200); // Wait for retraction
@@ -302,17 +325,21 @@ public class SimpleAutonomous extends LinearOpMode {
             sleep(500); // Wait for servo to reach position
 
             // Activate ball pusher to shoot
+            //gripper needs to rotate while kicker motor pushes ball?
+            
             if (kicker_motor != null) {
-                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
-                sleep(150); // Hold retraction
-                kicker_motor.setPower(0.8);  // Activate kicker motor
-                sleep(150); // Hold kicker motor
-                kicker_motor.setPower(0.0);  // Stop kicker motor
                 if (grip_servo_left != null && grip_servo_right != null) {
                     // Open gripper to release any held balls (if needed)
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
+                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(0.8);  // Activate kicker motor
+                
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                
                 }
             }
             sleep(200); // Wait for retraction
@@ -360,18 +387,21 @@ public class SimpleAutonomous extends LinearOpMode {
             }
             sleep(500); // Wait for servo to reach position
 
-            // Activate ball pusher to shoot
+            //gripper needs to rotate while kicker motor pushes ball?
+            
             if (kicker_motor != null) {
-                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
-                sleep(150); // Hold retraction
-                kicker_motor.setPower(0.8);  // Activate kicker motor
-                sleep(150); // Hold kicker motor
-                kicker_motor.setPower(0.0);  // Stop kicker motor
                 if (grip_servo_left != null && grip_servo_right != null) {
                     // Open gripper to release any held balls (if needed)
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
+                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(0.8);  // Activate kicker motor
+                
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                
                 }
             }
             sleep(200); // Wait for retraction
@@ -424,17 +454,21 @@ public class SimpleAutonomous extends LinearOpMode {
             sleep(500); // Wait for servo to reach position
 
             // Activate ball pusher to shoot
+            //gripper needs to rotate while kicker motor pushes ball?
+            
             if (kicker_motor != null) {
-                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
-                sleep(150); // Hold retraction
-                kicker_motor.setPower(0.8);  // Activate kicker motor
-                sleep(150); // Hold kicker motor
-                kicker_motor.setPower(0.0);  // Stop kicker motor
                 if (grip_servo_left != null && grip_servo_right != null) {
                     // Open gripper to release any held balls (if needed)
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
+                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(0.8);  // Activate kicker motor
+                
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                
                 }
             }
             sleep(200); // Wait for retraction
@@ -476,17 +510,21 @@ public class SimpleAutonomous extends LinearOpMode {
             sleep(500); // Wait for servo to reach position
 
             // Activate ball pusher to shoot
+           //gripper needs to rotate while kicker motor pushes ball?
+            
             if (kicker_motor != null) {
-                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
-                sleep(150); // Hold retraction
-                kicker_motor.setPower(0.8);  // Activate kicker motor
-                sleep(150); // Hold kicker motor
-                kicker_motor.setPower(0.0);  // Stop kicker motor
                 if (grip_servo_left != null && grip_servo_right != null) {
                     // Open gripper to release any held balls (if needed)
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
+                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(0.8);  // Activate kicker motor
+                
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                
                 }
             }
             sleep(200); // Wait for retraction
@@ -535,17 +573,21 @@ public class SimpleAutonomous extends LinearOpMode {
             sleep(500); // Wait for servo to reach position
 
             // Activate ball pusher to shoot
+           //gripper needs to rotate while kicker motor pushes ball?
+            
             if (kicker_motor != null) {
-                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
-                sleep(150); // Hold retraction
-                kicker_motor.setPower(0.8);  // Activate kicker motor
-                sleep(150); // Hold kicker motor
-                kicker_motor.setPower(0.0);  // Stop kicker motor
                 if (grip_servo_left != null && grip_servo_right != null) {
                     // Open gripper to release any held balls (if needed)
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
+                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(0.8);  // Activate kicker motor
+                
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                
                 }
             }
             sleep(200); // Wait for retraction
@@ -594,17 +636,21 @@ public class SimpleAutonomous extends LinearOpMode {
             sleep(500); // Wait for servo to reach position
 
             // Activate ball pusher to shoot
+           //gripper needs to rotate while kicker motor pushes ball?
+            
             if (kicker_motor != null) {
-                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
-                sleep(150); // Hold retraction
-                kicker_motor.setPower(0.8);  // Activate kicker motor
-                sleep(150); // Hold kicker motor
-                kicker_motor.setPower(0.0);  // Stop kicker motor
                 if (grip_servo_left != null && grip_servo_right != null) {
                     // Open gripper to release any held balls (if needed)
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
+                kicker_motor.setPower(-0.8);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(0.8);  // Activate kicker motor
+                
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                
                 }
             }
             sleep(200); // Wait for retraction
