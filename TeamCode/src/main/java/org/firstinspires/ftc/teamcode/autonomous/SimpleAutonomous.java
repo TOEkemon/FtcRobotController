@@ -86,6 +86,11 @@ public class SimpleAutonomous extends LinearOpMode {
             
             // Update IMU telemetry
             updateIMUTelemetry();
+
+            telemetry.addData("Alliance", isRedAlliance);
+            telemetry.addData("Side", isFarSide);
+            telemetry.addData("False red means blue, false far side means near side");
+            telemetry.addData("Only red far and blue far are implemented for now");
             
             telemetry.update();
             sleep(50);
@@ -173,7 +178,7 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                 wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
+            
             
             // Activate ball pusher to shoot
             if (kicker_motor != null) {
@@ -218,7 +223,7 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                 wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
+            
             
             // Activate ball pusher to shoot
             if (kicker_motor != null) {
@@ -269,7 +274,7 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                 wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
+            
             
            // Activate ball pusher to shoot
             if (kicker_motor != null) {
@@ -320,7 +325,7 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                 wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
+            
             
             // Activate ball pusher to shoot
             if (kicker_motor != null) {
@@ -375,7 +380,7 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                 wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
+            
             
             // Activate ball pusher to shoot
             if (kicker_motor != null) {
@@ -421,7 +426,7 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                 wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
+            
             
             // Activate ball pusher to shoot
             if (kicker_motor != null) {
@@ -472,7 +477,7 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                 wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
+           
             
             // Activate ball pusher to shoot
             if (kicker_motor != null) {
@@ -523,7 +528,6 @@ public class SimpleAutonomous extends LinearOpMode {
             if (wheel_rotation != null) {
                wheel_rotation.setPower(150); // Rotate barrel to position
             }
-            sleep(500); // Wait for servo to reach position
             
            // Activate ball pusher to shoot
             if (kicker_motor != null) {
