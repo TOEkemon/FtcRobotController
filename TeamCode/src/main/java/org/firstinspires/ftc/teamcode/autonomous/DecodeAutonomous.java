@@ -176,6 +176,9 @@ public class DecodeAutonomous extends LinearOpMode {
        public static final double BLUE_SECRET_TUNNEL_X = 69.0;  // Approximate X position for blue secret tunnel (mirrored)
        public static final double BLUE_SECRET_TUNNEL_Y = 0.0;   // Approximate Y position for blue secret tunnel
    }
+   
+   // Ball-related constants (similar to ARTIFACT constants)
+   private static final int MAX_BALLS = 3; // Maximum number of balls allowed on robot at any time (hard constraint)
 
 
    // Hardware components
@@ -211,6 +214,10 @@ public class DecodeAutonomous extends LinearOpMode {
    private VisionPortal intakeVisionPortal;
    private IntakeColorDetectionPipeline intakeColorPipeline;
 
+   // Starting position coordinates based on alliance and side selection
+   private double startingX = 0.0;
+   private double startingY = 0.0;
+
 
 
 
@@ -218,6 +225,11 @@ public class DecodeAutonomous extends LinearOpMode {
    private BarrelController barrelController;
    private ShooterController shooterController;
    private AprilTagVisionProcessor visionProcessor;
+
+   // Odometry variables for tracking robot position
+   private double currentX = 0.0;  // Current X coordinate of robot center
+   private double currentY = 0.0;  // Current Y coordinate of robot center
+   private double currentHeading = 0.0;  // Current robot heading in degrees
    private BalldentifierAndDriver ballDetector;
 
    private DriveAndIntake driveAndIntake; 
@@ -358,21 +370,33 @@ public class DecodeAutonomous extends LinearOpMode {
        // Single-button selection during init
        while (opModeInInit()) {
            if (gamepad1.a) {
+               // Red-Near Launch Line (Right Lower Launch Line segment: y = -x - 48, x from 0 to 24)
+               startingX = 12.0; // Midpoint of launch line segment for Red-Near
+               startingY = -60.0; // Calculated from y = -x - 48 when x = 12
                isRedAlliance = true;
-               isNearSide = false; // Far side
-               telemetry.addData("Selected", "Red-Far");
+               isNearSide = true; // Near side
+               telemetry.addData("Selected", "Red-Near Launch Line");
            } else if (gamepad1.b) {
+               // Blue-Far Launch Line (Left Upper Launch Line segment: y = -x, x from -58.2 to 0)
+               startingX = -29.1; // Midpoint of launch line segment for Blue-Far
+               startingY = 29.1; // Calculated from y = -x when x = -29.1
                isRedAlliance = false; // Blue alliance
                isNearSide = false; // Far side
-               telemetry.addData("Selected", "Blue-Far");
+               telemetry.addData("Selected", "Blue-Far Launch Line");
            } else if (gamepad1.x) {
+               // Red-Far Launch Line (Right Upper Launch Line segment: y = x, x from 0 to 58.2)
+               startingX = 29.1; // Midpoint of launch line segment for Red-Far
+               startingY = 29.1; // Calculated from y = x when x = 29.1
                isRedAlliance = true;
-               isNearSide = true; // Near side
-               telemetry.addData("Selected", "Red-Near");
+               isNearSide = false; // Far side
+               telemetry.addData("Selected", "Red-Far Launch Line");
            } else if (gamepad1.y) {
+               // Blue-Near Launch Line (Left Lower Launch Line segment: y = x - 48, x from -24 to 0)
+               startingX = -12.0; // Midpoint of launch line segment for Blue-Near
+               startingY = -60.0; // Calculated from y = x - 48 when x = -12
                isRedAlliance = false; // Blue alliance
                isNearSide = true; // Near side
-               telemetry.addData("Selected", "Blue-Near");
+               telemetry.addData("Selected", "Blue-Near Launch Line");
            } else {
                // Show default message if no button pressed yet
                telemetry.addData("Current Selection", "None - Press A, B, X, or Y");
@@ -387,6 +411,20 @@ public class DecodeAutonomous extends LinearOpMode {
        // Wait for start
        waitForStart();
        startTime = System.currentTimeMillis();
+
+
+       // Initialize odometry system with starting position
+       currentX = startingX;
+       currentY = startingY;
+       if (imu != null) {
+           try {
+               YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+               currentHeading = orientation.getYaw(AngleUnit.DEGREES);
+           } catch (Exception e) {
+               telemetry.addData("Warning", "Could not get initial heading: " + e.getMessage());
+               currentHeading = 0.0; // Default to 0 if IMU fails
+           }
+       }
 
 
        // Start the shooter motor immediately as per requirements
@@ -576,27 +614,142 @@ public class DecodeAutonomous extends LinearOpMode {
                }
                break;
 
-           // gonna comment this out for now since we are using the drive and intake class to do this part
-            case DRIVE_TO_ROW:
-               // Navigation phase: drive to the designated ball collection area
-               //driveToBallRow(currentRowIndex);
+           case DRIVE_TO_ROW:
+               // Navigation phase: drive to the designated ball collection area using coordinates
+               // Calculate target coordinates based on alliance and row index
+               double targetX = 0.0;
+               double targetY = 0.0;
 
-                //instance with constructor so opmode knows what motors to use
-                // Note: DriveAndIntake constructor has been updated to not require color sensor
-                driveAndIntake = new DriveAndIntake(
-                );
+               // Determine target coordinates based on alliance and current row index
+               if (isRedAlliance) {
+                   if (isNearSide) {
+                       // Red Near Side - use Red Near Spike Mark coordinates
+                       switch (currentRowIndex) {
+                           case 0: // Near Spike Mark (Audience side)
+                               targetX = 48.0; // X coordinate for red near spike
+                               targetY = -36.0; // Y coordinate for red near spike
+                               break;
+                           case 1: // Far Spike Mark (GOAL side)
+                               targetX = 48.0; // X coordinate for red far spike
+                               targetY = 36.0; // Y coordinate for red far spike
+                               break;
+                           case 2: // Middle Spike Mark (Center)
+                               targetX = 48.0; // X coordinate for red middle spike
+                               targetY = 0.0; // Y coordinate for red middle spike
+                               break;
+                           default:
+                               // Default to near spike if invalid index
+                               targetX = 48.0;
+                               targetY = -36.0;
+                               break;
+                       }
+                   } else {
+                       // Red Far Side - use Red Far Spike Mark coordinates
+                       switch (currentRowIndex) {
+                           case 0: // Near Spike Mark (Audience side)
+                               targetX = 48.0; // X coordinate for red near spike
+                               targetY = -36.0; // Y coordinate for red near spike
+                               break;
+                           case 1: // Far Spike Mark (GOAL side)
+                               targetX = 48.0; // X coordinate for red far spike
+                               targetY = 36.0; // Y coordinate for red far spike
+                               break;
+                           case 2: // Middle Spike Mark (Center)
+                               targetX = 48.0; // X coordinate for red middle spike
+                               targetY = 0.0; // Y coordinate for red middle spike
+                               break;
+                           default:
+                               // Default to near spike if invalid index
+                               targetX = 48.0;
+                               targetY = -36.0;
+                               break;
+                       }
+                   }
+               } else {
+                   if (isNearSide) {
+                       // Blue Near Side - use Blue Near Spike Mark coordinates
+                       switch (currentRowIndex) {
+                           case 0: // Near Spike Mark (Audience side)
+                               targetX = -48.0; // X coordinate for blue near spike (mirrored)
+                               targetY = 36.0; // Y coordinate for blue near spike (mirrored)
+                               break;
+                           case 1: // Far Spike Mark (GOAL side)
+                               targetX = -48.0; // X coordinate for blue far spike (mirrored)
+                               targetY = -36.0; // Y coordinate for blue far spike (mirrored)
+                               break;
+                           case 2: // Middle Spike Mark (Center)
+                               targetX = -48.0; // X coordinate for blue middle spike (mirrored)
+                               targetY = 0.0; // Y coordinate for blue middle spike (mirrored)
+                               break;
+                           default:
+                               // Default to near spike if invalid index
+                               targetX = -48.0;
+                               targetY = 36.0;
+                               break;
+                       }
+                   } else {
+                       // Blue Far Side - use Blue Far Spike Mark coordinates
+                       switch (currentRowIndex) {
+                           case 0: // Near Spike Mark (Audience side)
+                               targetX = -48.0; // X coordinate for blue near spike (mirrored)
+                               targetY = 36.0; // Y coordinate for blue near spike (mirrored)
+                               break;
+                           case 1: // Far Spike Mark (GOAL side)
+                               targetX = -48.0; // X coordinate for blue far spike (mirrored)
+                               targetY = -36.0; // Y coordinate for blue far spike (mirrored)
+                               break;
+                           case 2: // Middle Spike Mark (Center)
+                               targetX = -48.0; // X coordinate for blue middle spike (mirrored)
+                               targetY = 0.0; // Y coordinate for blue middle spike (mirrored)
+                               break;
+                           default:
+                               // Default to near spike if invalid index
+                               targetX = -48.0;
+                               targetY = 36.0;
+                               break;
+                       }
+                   }
+               }
 
-                List<MatOfPoint> contours = pipeline.getAllContours();
+               // Drive to calculated target position using coordinate navigation
+               moveRobotToPosition(targetX, targetY);
+
+               // Check if we've reached the target location
+               // In a real implementation, this would check if we're close enough to the target coordinates
+               // For now, we'll assume we've reached the location after attempting to move there
+               double distanceToTarget = Math.sqrt(Math.pow(currentX - targetX, 2) + Math.pow(currentY - targetY, 2));
+               if (distanceToTarget < 5.0) { // Within 5 inches tolerance
+                   // Successfully reached the ball row, start intake and sorting
+                   currentState = AutonomousState.INTAKE_AND_SORT;
+               }
+               break;
+
+
+           case INTAKE_AND_SORT:
+               // Ball collection and sorting phase: intake balls while sorting them
+               // according to the detected target pattern
+               
+               // After collecting from the predetermined spike marks, use camera detection
+               // to find and collect remaining balls in the center of the field
+               
+               //instance with constructor so opmode knows what motors to use
+               // Note: DriveAndIntake constructor has been updated to not require color sensor
+               if (driveAndIntake == null) {
+                   driveAndIntake = new DriveAndIntake();
+               }
+
+               List<MatOfPoint> contours = pipeline.getAllContours();
                if (contours != null && !contours.isEmpty()) {
                     driveAndIntake.driveToBall(contours, 640, 480);
                }
-               
 
-
+               // Use the DriveAndIntake class to handle ball collection in the center field area
                int ballX = driveAndIntake.getCenterX();
+               int ballY = driveAndIntake.getCenterY();
 
                Point frameCenter = new Point(driveAndIntake.camWidth / 2, driveAndIntake.camHeight / 2);
                int camCenterX = driveAndIntake.camWidth / 2;
+               int camCenterY = driveAndIntake.camHeight / 2;
 
                //align ball's x value with frame's x value
                 if (ballX <= camCenterX-driveAndIntake.offset-20 && ballX >= camCenterX-driveAndIntake.offset+20) {
@@ -638,70 +791,22 @@ public class DecodeAutonomous extends LinearOpMode {
                     }
                 }
 
-       /*while (intakeAreaRed >= 128 && intakeAreaGreen >= 128 && intakeAreaBlue >= 128 && intakeAreaRed <= 150 && intakeAreaGreen <= 150 && intakeAreaBlue <= 150) {
-           intakeMotor.setPower(1);
-           frontLeftMotor.setPower(.5);
-           backLeftMotor.setPower(.5);
-           frontRightMotor.setPower(.5);
-           backRightMotor.setPower(.5);
-           if (intakeAreaRed < 128 || intakeAreaGreen < 128 || intakeAreaBlue < 128 || intakeAreaRed > 150 || intakeAreaGreen > 150 || intakeAreaBlue > 150) {
-               intakeMotor.setPower(0);
-               frontLeftMotor.setPower(0);
-               backLeftMotor.setPower(0);
-               frontRightMotor.setPower(0);
-               backRightMotor.setPower(0);
-               break;
-           }
-         }*/
-               telemetry.addData("centerX: ", driveAndIntake.centerX);
-               telemetry.addData("centerY: ", driveAndIntake.centerY); 
-               telemetry.addData("camCenterX: ", camCenterX);
-               telemetry.addData("camCenterY: ", driveAndIntake.camCenterY);
-               // Removed color sensor telemetry since color sensor is not used in this implementation
-               telemetry.addData("Current Draw",driveAndIntake.currentDraw);
-               telemetry.update();
-               sleep(10);
-
-
-               // Check if we've reached the target location
-               if (hasReachedBallRow(currentRowIndex)) {
-                   // Successfully reached the ball row, start intake and sorting
-                   currentState = AutonomousState.INTAKE_AND_SORT;
-               }
-               break;
-
-
-           case INTAKE_AND_SORT:
-               // ARTIFACT collection and sorting phase: intake ARTIFACTS while sorting them
-               // according to the detected target pattern
-               intakeMotor.setPower(1.0); // Start the intake mechanism
-
-
-               
-
-
-
-               // Use the color sensor to detect ARTIFACT colors as they enter the intake
-               // The ball detection vision system would be used for navigation to ARTIFACT positions
-               // but for sorting, we rely on the color sensor at the intake point
-
-
                // Continue intake and sorting until we reach capacity or timeout
-               // Note: Max 3 ARTIFACTS allowed on robot at any time as per hard constraint
+               // Note: Max 3 balls allowed on robot at any time as per hard constraint
                boolean barrelIsFull = (barrelController != null) ? barrelController.isFull() : false;
-               if (ballsCollected < MAX_ARTIFACTS && !barrelIsFull) {
-                   // Check if we're within the ARTIFACT control limit (max 3 simultaneously)
-                   if (isWithinArtifactControlLimit()) {
-                       // The barrel controller handles sorting as ARTIFACTS come in based on
+               if (ballsCollected < MAX_BALLS && !barrelIsFull) {
+                   // Check if we're within the ball control limit (max 3 simultaneously)
+                   if (isWithinBallControlLimit()) {
+                       // The barrel controller handles sorting as balls come in based on
                        // the detected color and the target pattern sequence
                        // In a real implementation, the color sensor would trigger sorting automatically
-                       // For simulation, we'll check if ARTIFACTS are detected by the color sensor
-                       if (isBallDetectedByColorSensor()) { // Check if an ARTIFACT has entered the intake area
-                           // An ARTIFACT has been detected, so we can simulate collection
+                       // For simulation, we'll check if balls are detected by the color sensor
+                       if (isBallDetectedByColorSensor()) { // Check if a ball has entered the intake area
+                           // A ball has been detected, so we can simulate collection
                            ballsCollected++;
 
 
-                           // Sort the ARTIFACT using the color sensor and target pattern
+                           // Sort the ball using the color sensor and target pattern
                            sortBallWithColorSensor();
                        }
                    } else {
@@ -711,10 +816,10 @@ public class DecodeAutonomous extends LinearOpMode {
                }
 
 
-               // Transition to next state when we have 3 ARTIFACTS, barrel is full, or timeout occurs
-               // Ensuring compliance with the hard constraint of max 3 ARTIFACTS at any time
+               // Transition to next state when we have 3 balls, barrel is full, or timeout occurs
+               // Ensuring compliance with the hard constraint of max 3 balls at any time
                boolean barrelFullCheck = (barrelController != null) ? barrelController.isFull() : false;
-               if (ballsCollected >= MAX_ARTIFACTS || barrelFullCheck || intakeTimeout()) {
+               if (ballsCollected >= MAX_BALLS || barrelFullCheck || intakeTimeout()) {
                    intakeMotor.setPower(0.0); // Stop the intake mechanism
                    currentState = AutonomousState.DRIVE_TO_LINE; // Move to shooting position
                }
@@ -1198,6 +1303,15 @@ public class DecodeAutonomous extends LinearOpMode {
        // Check if we're controlling fewer than the maximum allowed ARTIFACTS
        return ballsCollected < MAX_ARTIFACTS;
    }
+   
+   /**
+    * Checks if the robot is within the ball control limit (max 3 simultaneously)
+    * @return true if within limit, false if over limit
+    */
+   private boolean isWithinBallControlLimit() {
+       // Check if we're controlling fewer than the maximum allowed balls
+       return ballsCollected < MAX_BALLS;
+   }
 
 
    /**
@@ -1568,5 +1682,6 @@ public class DecodeAutonomous extends LinearOpMode {
                targetPattern[0] + ", " + targetPattern[1] + ", " + targetPattern[2] : "Not detected");
        telemetry.update();
    }
+   
 }
 

@@ -72,6 +72,10 @@ public class DriveAndIntake {
     public int getCenterX() {
         return centerX;
     }
+    
+    public int getCenterY() {
+        return centerY;
+    }
 
    // contour is a MatOfPoint
 
