@@ -338,33 +338,32 @@ public class DecodeAutonomous extends LinearOpMode {
                startingY = -60.0; // Calculated from y = -x - 48 when x = 12
                isRedAlliance = true;
                isNearSide = true; // Near side
-               telemetry.addData("Selected", "Red-Near Launch Line");
            } else if (gamepad1.b) {
                // Blue-Far Launch Line (Left Upper Launch Line segment: y = -x, x from -58.2 to 0)
                startingX = -29.1; // Midpoint of launch line segment for Blue-Far
                startingY = 29.1; // Calculated from y = -x when x = -29.1
                isRedAlliance = false; // Blue alliance
                isNearSide = false; // Far side
-               telemetry.addData("Selected", "Blue-Far Launch Line");
            } else if (gamepad1.x) {
                // Red-Far Launch Line (Right Upper Launch Line segment: y = x, x from 0 to 58.2)
                startingX = 29.1; // Midpoint of launch line segment for Red-Far
                startingY = 29.1; // Calculated from y = x when x = 29.1
                isRedAlliance = true;
                isNearSide = false; // Far side
-               telemetry.addData("Selected", "Red-Far Launch Line");
            } else if (gamepad1.y) {
                // Blue-Near Launch Line (Left Lower Launch Line segment: y = x - 48, x from -24 to 0)
                startingX = -12.0; // Midpoint of launch line segment for Blue-Near
                startingY = -60.0; // Calculated from y = x - 48 when x = -12
                isRedAlliance = false; // Blue alliance
                isNearSide = true; // Near side
-               telemetry.addData("Selected", "Blue-Near Launch Line");
-           } else {
-               // Show default message if no button pressed yet
-               telemetry.addData("Current Selection", "None - Press A, B, X, or Y");
            }
 
+           // Persistent telemetry display
+           telemetry.addData("Status", "Select Position (A, B, X, Y) then press Play");
+           String alliance = isRedAlliance ? "RED" : "BLUE";
+           String side = isNearSide ? "NEAR" : "FAR";
+           telemetry.addData("CURRENT SELECTION", "%s - %s", alliance, side);
+           telemetry.addData("Coordinates", "X: %.1f, Y: %.1f", startingX, startingY);
 
            telemetry.update();
            sleep(10);
