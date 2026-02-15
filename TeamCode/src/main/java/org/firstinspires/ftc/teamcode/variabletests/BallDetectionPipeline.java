@@ -30,8 +30,6 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import java.util.List;
 import java.util.ArrayList;
 
-@Autonomous(name = "Offset Test Opmode", group = "Testing")
-
 // Custom OpenCV Pipeline for ball detection
 class BallDetectionPipeline extends OpenCvPipeline {
     // Color thresholds for detecting purple and green balls

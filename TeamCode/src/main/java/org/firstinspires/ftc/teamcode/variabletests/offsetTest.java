@@ -30,7 +30,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import java.util.List;
 import java.util.ArrayList;
 
-@Autonomous(name = "Offset Test Opmode", group = "Testing")
+@Autonomous(name = "Offset Test OpMode", group = "Testing")
 public class offsetTest extends LinearOpMode{
 
     private WebcamName webcam;

@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -266,7 +263,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        //instance with constructor so opmode knows what motors to use
-       driveAndIntake = new DriveAndIntake(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor);
+       driveAndIntake = new DriveAndIntake(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, telemetry);
 
 
        //gives driveAndIntake contour and camera values
@@ -538,22 +535,6 @@ public class DecodeAutonomous extends LinearOpMode {
 
                    // Stop any scanning rotation
                    stopDriveMotors();
-               } else {
-                   // Still scanning - rotate slowly to search for AprilTags
-                   // Rotate at a slow speed to scan the environment
-                   String[] detectedPattern = visionProcessor.getTargetPattern();
-                   double scanPower = 0.2; // Slow rotation power
-                   frontLeftMotor.setPower(scanPower);
-                   frontRightMotor.setPower(-scanPower);
-                   backLeftMotor.setPower(scanPower);
-                   backRightMotor.setPower(-scanPower);
-                   if (detectedPattern != null) {
-                       targetPattern = detectedPattern.clone();
-                       visionProcessor.close();
-                       startOpenCV();
-                       stopDriveMotors();
-                       currentState = AutonomousState.DRIVE_TO_ROW;
-                   }
                }
                break;
 
@@ -678,7 +659,7 @@ public class DecodeAutonomous extends LinearOpMode {
                //instance with constructor so opmode knows what motors to use
                // Note: DriveAndIntake constructor has been updated to not require color sensor
                if (driveAndIntake == null) {
-                   driveAndIntake = new DriveAndIntake(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor);
+                   driveAndIntake = new DriveAndIntake(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor, telemetry);
                }
 
                List<MatOfPoint> contours = pipeline.getAllContours();

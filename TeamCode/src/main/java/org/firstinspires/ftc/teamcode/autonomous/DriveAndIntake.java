@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;  // Add this import
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;  // Add this import
 
 
@@ -38,6 +37,7 @@ public class DriveAndIntake {
    private Servo ballPushServo;
    private IMU imu;
    private WebcamName webcam;
+   private Telemetry telemetry;
 
 
 
@@ -87,8 +87,9 @@ public class DriveAndIntake {
 
 
    // Constructor
-   public DriveAndIntake(DcMotorEx intakeMotor) {
+   public DriveAndIntake(DcMotorEx intakeMotor, Telemetry telemetry) {
        this.intakeMotor = intakeMotor;
+       this.telemetry = telemetry;
    }
 
    public DriveAndIntake(
@@ -96,13 +97,15 @@ public class DriveAndIntake {
            DcMotor fr,
            DcMotor bl,
            DcMotor br,
-           DcMotorEx intake
+           DcMotorEx intake,
+           Telemetry telemetry
    ) {
        this.frontLeftMotor = fl;
        this.frontRightMotor = fr;
        this.backLeftMotor = bl;
        this.backRightMotor = br;
        this.intakeMotor = intake;
+       this.telemetry = telemetry;
    }
 
 
