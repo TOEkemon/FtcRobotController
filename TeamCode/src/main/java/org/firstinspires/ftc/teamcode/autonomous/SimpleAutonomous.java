@@ -87,6 +87,8 @@ public class SimpleAutonomous extends LinearOpMode {
             // Update IMU telemetry
             updateIMUTelemetry();
 
+            String isRedAliance;
+            string isFarSide;
             telemetry.addData("Alliance", isRedAlliance);
             telemetry.addData("Side", isFarSide);
             telemetry.addData("False red means blue, false far side means near side");
