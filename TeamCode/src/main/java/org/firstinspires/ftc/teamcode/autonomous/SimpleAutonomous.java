@@ -40,6 +40,9 @@ public class SimpleAutonomous extends LinearOpMode {
     // IMU
     private IMU imu;
 
+    // State tracking for telemetry
+    private String currentAction = "Initializing";
+
     // Alliance and side selection
     private boolean isRedAlliance = true;  // Default to red
     private boolean isFarSide = true;      // Default to far side
@@ -85,7 +88,7 @@ public class SimpleAutonomous extends LinearOpMode {
             }
 
             // Update IMU telemetry
-            updateIMUTelemetry();
+            updateDynamicTelemetry();
 
             String allianceString = "isRedAlliance";
             allianceString += "isFarSide";
@@ -108,7 +111,7 @@ public class SimpleAutonomous extends LinearOpMode {
             telemetry.addData("Status", "Red Near Autonomous not implemented yet");
             telemetry.update();
             while (opModeIsActive()) {
-                updateIMUTelemetry();
+                updateDynamicTelemetry();
                 telemetry.update();
                 sleep(100);
             }
@@ -117,7 +120,7 @@ public class SimpleAutonomous extends LinearOpMode {
             telemetry.addData("Status", "Blue Near Autonomous not implemented yet");
             telemetry.update();
             while (opModeIsActive()) {
-                updateIMUTelemetry();
+                updateDynamicTelemetry();
                 telemetry.update();
                 sleep(100);
             }
@@ -165,13 +168,18 @@ public class SimpleAutonomous extends LinearOpMode {
     private void runRedFarAutonomous() {
         // Initial actions
         // Drive backward 40 inches
+        currentAction = "Moving to Launch Line";
         driveDistance(-40.0, 0.5);  // Negative distance = backward
 
         // Start shooter motor at maximum speed
+        currentAction = "Spooling Shooter";
         shooter_motor.setPower(1.0);
+        updateDynamicTelemetry();
 
         // Shoot 3 balls with barrel rotation
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Ball " + (i+1);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -198,25 +206,31 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // First ball pickup row
         // Turn 45 degrees clockwise (positive for clockwise)
+        currentAction = "Turning to Row 1";
         turnDegrees(45.0, 0.3);
 
         // Drive forward 25 inches while running intake
         if (intakemotor != null) {
+            currentAction = "Intaking Row 1";
             intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
 
         // Drive backward 25 inches
         if (intakemotor != null) {
+            currentAction = "Returning with Row 1";
             intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6); // Back to launch line
 
         // Turn 45 degrees clockwise to face launch line
+        currentAction = "Aligning for Shoot 2";
         turnDegrees(45.0, 0.3);
 
         // Shoot collected balls (same as initial sequence)
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Collected " + (i+1);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -247,31 +261,39 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Second ball pickup row
         // Turn 45 degrees clockwise
+        currentAction = "Turning to Row 2";
         turnDegrees(45.0, 0.3);
 
         // Drive right 18 inches
+        currentAction = "Strafing to Row 2";
         strafeDistance(18.0, 0.5);
 
         // Drive forward 25 inches while running intake
         if (intakemotor != null) {
+            currentAction = "Intaking Row 2";
             intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
 
         // Drive backward 25 inches
         if (intakemotor != null) {
+            currentAction = "Returning with Row 2";
             intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
 
         // Drive left 18 inches
+        currentAction = "Strafing back from Row 2";
         strafeDistance(-18.0, 0.5);
 
         // Turn 45 degrees clockwise
+        currentAction = "Aligning for Shoot 3";
         turnDegrees(45.0, 0.3);
 
         // Shoot collected balls
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Collected " + (i+4);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -298,31 +320,39 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Third ball pickup row
         // Turn 45 degrees clockwise
+        currentAction = "Turning to Row 3";
         turnDegrees(45.0, 0.3);
 
         // Drive right 36 inches
+        currentAction = "Strafing to Row 3";
         strafeDistance(36.0, 0.5);
 
         // Drive forward 25 inches while running intake
         if (intakemotor != null) {
+            currentAction = "Intaking Row 3";
             intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
 
         // Drive backward 25 inches
         if (intakemotor != null) {
+            currentAction = "Returning with Row 3";
             intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
 
         // Drive left 36 inches
+        currentAction = "Strafing back from Row 3";
         strafeDistance(-36.0, 0.5);
 
         // Turn 45 degrees clockwise
+        currentAction = "Aligning for Final Shoot";
         turnDegrees(45.0, 0.3);
 
         // Shoot collected balls
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Final " + (i+1);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -349,18 +379,21 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Parking
         // Turn 45 degrees clockwise
+        currentAction = "Parking";
         turnDegrees(45.0, 0.3);
 
         // Drive right 34 inches
         strafeDistance(34.0, 0.5);
 
         // Turn off all systems
+        currentAction = "Done";
         if (shooter_motor != null) {
             shooter_motor.setPower(0.0);
         }
         if (intakemotor != null) {
             intakemotor.setPower(0.0);
         }
+        updateDynamicTelemetry();
     }
 
     /**
@@ -369,15 +402,20 @@ public class SimpleAutonomous extends LinearOpMode {
     private void runBlueFarAutonomous() {
         // Initial actions
         // Drive backward 40 inches (from facing backward)
+        currentAction = "Moving to Launch Line";
         driveDistance(-40.0, 0.5);  // Negative distance = backward
 
         // Start shooter motor at maximum speed
         if (shooter_motor != null) {
+            currentAction = "Spooling Shooter";
             shooter_motor.setPower(1.0);
+            updateDynamicTelemetry();
         }
 
         // Shoot 3 balls with barrel rotation
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Ball " + (i+1);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -405,25 +443,31 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // First ball pickup row
         // Turn 45 degrees counterclockwise (negative for counterclockwise)
+        currentAction = "Turning to Row 1";
         turnDegrees(-45.0, 0.3);
 
         // Drive forward 25 inches while running intake
         if (intakemotor != null) {
+            currentAction = "Intaking Row 1";
             intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
 
         // Drive backward 25 inches
         if (intakemotor != null) {
+            currentAction = "Returning with Row 1";
             intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6); // Back to launch line
 
         // Turn 45 degrees clockwise to face launch line
+        currentAction = "Aligning for Shoot 2";
         turnDegrees(45.0, 0.3);
 
         // Shoot collected balls (same as initial sequence)
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Collected " + (i+1);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -450,31 +494,39 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Second ball pickup row
         // Turn 45 degrees counterclockwise
+        currentAction = "Turning to Row 2";
         turnDegrees(-45.0, 0.3);
 
         // Drive left 18 inches (negative strafe = left)
+        currentAction = "Strafing to Row 2";
         strafeDistance(-18.0, 0.5);
 
         // Drive forward 25 inches while running intake
         if (intakemotor != null) {
+            currentAction = "Intaking Row 2";
             intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
 
         // Drive backward 25 inches
         if (intakemotor != null) {
+            currentAction = "Returning with Row 2";
             intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
 
         // Drive right 18 inches (positive strafe = right)
+        currentAction = "Strafing back from Row 2";
         strafeDistance(18.0, 0.5);
 
         // Turn 45 degrees clockwise
+        currentAction = "Aligning for Shoot 3";
         turnDegrees(45.0, 0.3);
 
         // Shoot collected balls
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Collected " + (i+4);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -501,31 +553,39 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Third ball pickup row
         // Turn 45 degrees counterclockwise
+        currentAction = "Turning to Row 3";
         turnDegrees(-45.0, 0.3);
 
         // Drive left 36 inches
+        currentAction = "Strafing to Row 3";
         strafeDistance(-36.0, 0.5);
 
         // Drive forward 25 inches while running intake
         if (intakemotor != null) {
+            currentAction = "Intaking Row 3";
             intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
 
         // Drive backward 25 inches
         if (intakemotor != null) {
+            currentAction = "Returning with Row 3";
             intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
 
         // Drive right 36 inches
+        currentAction = "Strafing back from Row 3";
         strafeDistance(36.0, 0.5);
 
         // Turn 45 degrees clockwise
+        currentAction = "Aligning for Final Shoot";
         turnDegrees(45.0, 0.3);
 
         // Shoot collected balls
         for (int i = 0; i < 3; i++) {
+            currentAction = "Shooting Final " + (i+1);
+            updateDynamicTelemetry();
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
             if (wheel_rotation != null) {
@@ -552,18 +612,21 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Parking
         // Turn 45 degrees counterclockwise
+        currentAction = "Parking";
         turnDegrees(-45.0, 0.3);
 
         // Drive left 34 inches
         strafeDistance(-34.0, 0.5);
 
         // Turn off all systems
+        currentAction = "Done";
         if (shooter_motor != null) {
             shooter_motor.setPower(0.0);
         }
         if (intakemotor != null) {
             intakemotor.setPower(0.0);
         }
+        updateDynamicTelemetry();
     }
 
     /**
@@ -586,6 +649,7 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Set motors to run to position
         setRunToPositionMode();
+        currentAction = String.format("Driving %.1f inches", distanceInches);
 
         // Set power with correct direction
         double direction = distanceInches >= 0 ? power : -power;
@@ -600,14 +664,7 @@ public class SimpleAutonomous extends LinearOpMode {
                 (front_right_motor != null && front_right_motor.isBusy()) &&
                 (back_left_motor != null && back_left_motor.isBusy()) &&
                 (back_right_motor != null && back_right_motor.isBusy())) {
-            updateIMUTelemetry();
-            telemetry.addData("Driving", "%.1f inches", distanceInches);
-            telemetry.addData("Target Ticks", targetTicks);
-            if (front_left_motor != null) telemetry.addData("Current FL", front_left_motor.getCurrentPosition());
-            if (front_right_motor != null) telemetry.addData("Current FR", front_right_motor.getCurrentPosition());
-            if (back_left_motor != null) telemetry.addData("Current BL", back_left_motor.getCurrentPosition());
-            if (back_right_motor != null) telemetry.addData("Current BR", back_right_motor.getCurrentPosition());
-            telemetry.update();
+            updateDynamicTelemetry();
             sleep(10);
         }
 
@@ -637,6 +694,7 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Set motors to run to position
         setRunToPositionMode();
+        currentAction = String.format("Strafing %.1f inches", distanceInches);
 
         // Set power with correct direction
         double absPower = Math.abs(power);
@@ -651,14 +709,7 @@ public class SimpleAutonomous extends LinearOpMode {
                 (front_right_motor != null && front_right_motor.isBusy()) &&
                 (back_left_motor != null && back_left_motor.isBusy()) &&
                 (back_right_motor != null && back_right_motor.isBusy())) {
-            updateIMUTelemetry();
-            telemetry.addData("Strafing", "%.1f inches", distanceInches);
-            telemetry.addData("Target Ticks", targetTicks);
-            if (front_left_motor != null) telemetry.addData("Current FL", front_left_motor.getCurrentPosition());
-            if (front_right_motor != null) telemetry.addData("Current FR", front_right_motor.getCurrentPosition());
-            if (back_left_motor != null) telemetry.addData("Current BL", back_left_motor.getCurrentPosition());
-            if (back_right_motor != null) telemetry.addData("Current BR", back_right_motor.getCurrentPosition());
-            telemetry.update();
+            updateDynamicTelemetry();
             sleep(10);
         }
 
@@ -684,6 +735,7 @@ public class SimpleAutonomous extends LinearOpMode {
 
         // Calculate target heading
         double targetHeading = initialHeading + degrees;
+        currentAction = String.format("Turning %.1f degrees", degrees);
 
         // Normalize target heading to -180 to 180 range
         while (targetHeading > 180) targetHeading -= 360;
@@ -721,12 +773,7 @@ public class SimpleAutonomous extends LinearOpMode {
                 break;
             }
 
-            updateIMUTelemetry();
-            telemetry.addData("Turning", "%.1f degrees", degrees);
-            telemetry.addData("Target Heading", "%.1f", targetHeading);
-            telemetry.addData("Current Heading", "%.1f", currentHeading);
-            telemetry.addData("Heading Error", "%.1f", headingError);
-            telemetry.update();
+            updateDynamicTelemetry();
             sleep(10);
         }
 
@@ -774,23 +821,44 @@ public class SimpleAutonomous extends LinearOpMode {
     }
 
     /**
-     * Update IMU telemetry with current values
-     * This is the IMU data that will be displayed on the Driver Station
+     * Update dynamic telemetry with a full dashboard of robot data
      */
-    private void updateIMUTelemetry() {
+    private void updateDynamicTelemetry() {
+        telemetry.addLine("=== ROBOT STATUS ===");
+        telemetry.addData("Current Action", currentAction);
+        telemetry.addData("Alliance", isRedAlliance ? "RED" : "BLUE");
+        telemetry.addData("Side", isFarSide ? "FAR" : "NEAR");
+
         if (imu != null) {
             try {
                 YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
-
-                // Display IMU data in simple format
                 telemetry.addData("IMU Heading", "%.2f", angles.getYaw(AngleUnit.DEGREES));
-                telemetry.addData("IMU Pitch", "%.2f", angles.getPitch(AngleUnit.DEGREES));
-                telemetry.addData("IMU Roll", "%.2f", angles.getRoll(AngleUnit.DEGREES));
             } catch (Exception e) {
-                telemetry.addData("IMU Error", e.getMessage());
+                telemetry.addData("IMU Error", "Failed to read");
             }
-        } else {
-            telemetry.addData("IMU", "Not initialized");
         }
+
+        telemetry.addLine("--- DRIVE MOTORS ---");
+        String pwr = "None";
+        if (front_left_motor != null && front_right_motor != null) {
+            pwr = String.format("FL:%.2f FR:%.2f BL:%.2f BR:%.2f", 
+                front_left_motor.getPower(), front_right_motor.getPower(),
+                back_left_motor.getPower(), back_right_motor.getPower());
+        }
+        telemetry.addData("Powers", pwr);
+
+        String enc = "None";
+        if (front_left_motor != null && front_right_motor != null) {
+            enc = String.format("FL:%d FR:%d BL:%d BR:%d", 
+                front_left_motor.getCurrentPosition(), front_right_motor.getCurrentPosition(),
+                back_left_motor.getCurrentPosition(), back_right_motor.getCurrentPosition());
+        }
+        telemetry.addData("Encoders", enc);
+
+        telemetry.addLine("--- MECHANISMS ---");
+        telemetry.addData("Intake Pwr", intakemotor != null ? String.format("%.2f", intakemotor.getPower()) : "N/A");
+        telemetry.addData("Shooter Pwr", shooter_motor != null ? String.format("%.2f", shooter_motor.getPower()) : "N/A");
+        
+        telemetry.update();
     }
 }
