@@ -72,28 +72,37 @@ public class SimpleAutonomous extends LinearOpMode {
             // Alliance selection
             if (gamepad1.a) {
                 isRedAlliance = true;
-                telemetry.addData("Alliance", "Red Selected");
+                telemetry.addData("Alliance Red Selected");
             } else if (gamepad1.b) {
                 isRedAlliance = false;
-                telemetry.addData("Alliance", "Blue Selected");
+                telemetry.addData("Alliance Blue Selected");
             }
 
             // Side selection
             if (gamepad1.x) {
                 isFarSide = false;  // Near side
-                telemetry.addData("Side", "Near Selected");
+                telemetry.addData("Side Near Selected");
             } else if (gamepad1.y) {
                 isFarSide = true;   // Far side
-                telemetry.addData("Side", "Far Selected");
+                telemetry.addData("Side Far Selected");
             }
 
             // Update IMU telemetry
             updateDynamicTelemetry();
 
             String allianceString = "isRedAlliance";
-            allianceString += "isFarSide";
-            telemetry.addData("Alliance, Far/near", allianceString);
+            if (isRedAlliance) {
+                allianceString = "Red";
+            } else {
+                allianceString = "Blue";
+            }
+            if (isFarSide) {
+                allianceString += " Far";
+            } else {
+                allianceString += " Near";
+            }
 
+            telemetry.addData("Alliance, Far/near", allianceString);
             telemetry.update();
             sleep(50);
         }
@@ -173,7 +182,7 @@ public class SimpleAutonomous extends LinearOpMode {
                     grip_servo_left.setPosition(0.0);  // Open position
                     grip_servo_right.setPosition(1.0); // Open position
                     sleep(200); // Wait for gripper to open
-        }
+                }
         currentAction = "Moving to Launch Line";
         driveDistance(-40.0, 0.5);  // Negative distance = backward
 
