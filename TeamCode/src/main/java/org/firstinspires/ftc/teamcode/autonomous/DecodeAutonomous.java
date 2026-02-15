@@ -301,38 +301,6 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
 
-       //initialize pipeline
-       int camViewId = hardwareMap.appContext
-               .getResources()
-               .getIdentifier("cameraMonitorViewId", "id",
-                       hardwareMap.appContext.getPackageName());
-
-
-       camera = OpenCvCameraFactory.getInstance()
-               .createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), camViewId);
-
-
-       camera.setPipeline(pipeline);
-
-
-       camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-           @Override
-           public void onOpened() {
-               camera.startStreaming(640, 480);
-           }
-
-
-           @Override
-           public void onError(int errorCode) {}
-       });
-
-
-
-
-
-
-
-
        // Now initialize controllers with the properly initialized hardware
        barrelController = new BarrelController(wheelRotationMotor);
        shooterController = new ShooterController(shooterMotor, kickerMotor, grip_servo_left, grip_servo_right);
@@ -544,6 +512,7 @@ public class DecodeAutonomous extends LinearOpMode {
                        targetPattern = detectedPattern.clone();
                    }
                    visionProcessor.close(); // Close vision processing after detection to save resources
+                   startOpenCV(); // Start EasyOpenCV for ball detection
 
 
                    // Move to the next phase: driving to the first ball row
@@ -556,37 +525,11 @@ public class DecodeAutonomous extends LinearOpMode {
                    // Timeout reached, move to next state with default pattern
                    // Create a default pattern if no tag was detected
                    targetPattern = new String[]{"PURPLE", "GREEN", "PURPLE"}; // Default fallback
-
-
-                   // Move to the next phase: driving to the first ball row
-                   currentState = AutonomousState.DRIVE_TO_ROW;
-
-
-                   // Stop any scanning rotation
-                   stopDriveMotors();
-               } else {
-                   // Still scanning - rotate slowly to search for AprilTags
-                   // Rotate at a slow speed to scan the environment
-                   String[] detectedPattern = visionProcessor.getTargetPattern();
-                   double scanPower = 0.2; // Slow rotation power
-                   frontLeftMotor.setPower(scanPower);
-                   frontRightMotor.setPower(-scanPower);
-                   backLeftMotor.setPower(scanPower);
-                   backRightMotor.setPower(-scanPower);
-                   if (detectedPattern != null) {
-                       targetPattern = detectedPattern.clone();
-                       stopDriveMotors();
-                       currentState = AutonomousState.DRIVE_TO_ROW;
+                   
+                   if (visionProcessor != null) {
+                       visionProcessor.close();
                    }
-               }
-
-
-               if (targetPattern != null) {
-                   // Pattern was detected, continue to next state
-               } else if ((currentTime - startTime) > 5000) { // 5 second timeout
-                   // Timeout reached, move to next state with default pattern
-                   // Create a default pattern if no tag was detected
-                   targetPattern = new String[]{"PURPLE", "GREEN", "PURPLE"}; // Default fallback
+                   startOpenCV();
 
 
                    // Move to the next phase: driving to the first ball row
@@ -606,6 +549,8 @@ public class DecodeAutonomous extends LinearOpMode {
                    backRightMotor.setPower(-scanPower);
                    if (detectedPattern != null) {
                        targetPattern = detectedPattern.clone();
+                       visionProcessor.close();
+                       startOpenCV();
                        stopDriveMotors();
                        currentState = AutonomousState.DRIVE_TO_ROW;
                    }
@@ -1713,6 +1658,44 @@ public class DecodeAutonomous extends LinearOpMode {
        telemetry.addData("Target Pattern", targetPattern != null ?
                targetPattern[0] + ", " + targetPattern[1] + ", " + targetPattern[2] : "Not detected");
        telemetry.update();
+   }
+
+   /**
+    * Initializes and starts the EasyOpenCV camera for ball detection.
+    * This is called after AprilTag detection is complete to avoid camera resource conflicts.
+    */
+   private void startOpenCV() {
+       try {
+           int camViewId = hardwareMap.appContext
+                   .getResources()
+                   .getIdentifier("cameraMonitorViewId", "id",
+                           hardwareMap.appContext.getPackageName());
+
+
+           camera = OpenCvCameraFactory.getInstance()
+                   .createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), camViewId);
+
+
+           camera.setPipeline(pipeline);
+
+
+           camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+               @Override
+               public void onOpened() {
+                   camera.startStreaming(640, 480);
+               }
+
+
+               @Override
+               public void onError(int errorCode) {
+                   telemetry.addData("Error", "OpenCV Camera failed to open: " + errorCode);
+                   telemetry.update();
+               }
+           });
+       } catch (Exception e) {
+           telemetry.addData("Error", "Failed to start OpenCV: " + e.getMessage());
+           telemetry.update();
+       }
    }
    
 }
