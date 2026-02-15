@@ -21,18 +21,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 public class SimpleAutonomous extends LinearOpMode {
 
     // Drive motors
-    private DcMotor frontLeftMotor;
-    private DcMotor frontRightMotor;
-    private DcMotor backLeftMotor;
-    private DcMotor backRightMotor;
+    private DcMotor front_left_motor;
+    private DcMotor front_right_motor;
+    private DcMotor back_left_motor;
+    private DcMotor back_right_motor;
     
     // Shooter and intake motors
-    private DcMotor intakeMotor;
-    private DcMotor shooterMotor;
+    private DcMotor intakemotor;
+    private DcMotor shooter_motor;
+    private DcMotor wheel_rotation;  // Barrel rotation motor
+    private DcMotor kicker_motor;     // Arm motor for ball pickup (if needed)
     
     // Servos
-    private Servo wheelRotationServo;  // Barrel rotation servo
-    private Servo ballPushServo;       // Ball pusher servo
+    private Servo grip_servo_left;  // Left grip servo
+    private Servo grip_servo_right; // Right grip servo
+    private Servo ball_push;       // Ball pusher servo
     
     // IMU
     private IMU imu;
@@ -122,33 +125,34 @@ public class SimpleAutonomous extends LinearOpMode {
      */
     private void initializeHardware() {
         // Drive motors
-        frontLeftMotor = hardwareMap.get(DcMotor.class, "front_left_motor");
-        frontRightMotor = hardwareMap.get(DcMotor.class, "front_right_motor");
-        backLeftMotor = hardwareMap.get(DcMotor.class, "back_left_motor");
-        backRightMotor = hardwareMap.get(DcMotor.class, "back_right_motor");
+        front_left_motor = hardwareMap.get(DcMotor.class, "front_left_motor");
+        front_right_motor = hardwareMap.get(DcMotor.class, "front_right_motor");
+        back_left_motor = hardwareMap.get(DcMotor.class, "back_left_motor");
+        back_right_motor = hardwareMap.get(DcMotor.class, "back_right_motor");
         
         // Set motor directions (adjust as needed for your robot)
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
-        backRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        front_left_motor.setDirection(DcMotor.Direction.REVERSE);
+        back_left_motor.setDirection(DcMotor.Direction.REVERSE);
+        front_right_motor.setDirection(DcMotor.Direction.FORWARD);
+        back_right_motor.setDirection(DcMotor.Direction.FORWARD);
         
         // Shooter and intake motors
-        intakeMotor = hardwareMap.get(DcMotor.class, "intake_motor");
-        shooterMotor = hardwareMap.get(DcMotor.class, "shooter_motor");
+        intakemotor = hardwareMap.get(DcMotor.class, "intake_motor");
+        shooter_motor = hardwareMap.get(DcMotor.class, "shooter_motor");
+        kicker_motor = hardwareMap.get(DcMotor.class, "kicker_motor");
         
         // Servos
-        wheelRotationServo = hardwareMap.get(Servo.class, "wheel_rotation");
-        ballPushServo = hardwareMap.get(Servo.class, "ball_push");
+        wheel_rotation = hardwareMap.get(DcMotor.class, "wheel_rotation");
+        ball_push = hardwareMap.get(Servo.class, "ball_push");
         
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
         
         // Set motors to run using encoders
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        front_left_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        front_right_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        back_left_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        back_right_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     
     /**
@@ -160,22 +164,30 @@ public class SimpleAutonomous extends LinearOpMode {
         driveDistance(-40.0, 0.5);  // Negative distance = backward
         
         // Start shooter motor at maximum speed
-        shooterMotor.setPower(1.0);
+        shooter_motor.setPower(1.0);
         
         // Shoot 3 balls with barrel rotation
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+                wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
             // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
         }
@@ -185,14 +197,14 @@ public class SimpleAutonomous extends LinearOpMode {
         turnDegrees(45.0, 0.3);
         
         // Drive forward 25 inches while running intake
-        if (intakeMotor != null) {
-            intakeMotor.setPower(1.0); // Start intake
+        if (intakemotor != null) {
+            intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
         
         // Drive backward 25 inches
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0); // Stop intake
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6); // Back to launch line
         
@@ -203,16 +215,24 @@ public class SimpleAutonomous extends LinearOpMode {
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+                wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
             // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
         }
@@ -225,14 +245,14 @@ public class SimpleAutonomous extends LinearOpMode {
         strafeDistance(18.0, 0.5);
         
         // Drive forward 25 inches while running intake
-        if (intakeMotor != null) {
-            intakeMotor.setPower(1.0); // Start intake
+        if (intakemotor != null) {
+            intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
         
         // Drive backward 25 inches
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0); // Stop intake
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
         
@@ -246,16 +266,24 @@ public class SimpleAutonomous extends LinearOpMode {
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+                wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
-            // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+           // Activate ball pusher to shoot
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
         }
@@ -268,14 +296,14 @@ public class SimpleAutonomous extends LinearOpMode {
         strafeDistance(36.0, 0.5);
         
         // Drive forward 25 inches while running intake
-        if (intakeMotor != null) {
-            intakeMotor.setPower(1.0); // Start intake
+        if (intakemotor != null) {
+            intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
         
         // Drive backward 25 inches
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0); // Stop intake
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
         
@@ -289,16 +317,24 @@ public class SimpleAutonomous extends LinearOpMode {
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+                wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
             // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
         }
@@ -311,11 +347,11 @@ public class SimpleAutonomous extends LinearOpMode {
         strafeDistance(34.0, 0.5);
         
         // Turn off all systems
-        if (shooterMotor != null) {
-            shooterMotor.setPower(0.0);
+        if (shooter_motor != null) {
+            shooter_motor.setPower(0.0);
         }
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0);
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0);
         }
     }
     
@@ -328,26 +364,35 @@ public class SimpleAutonomous extends LinearOpMode {
         driveDistance(-40.0, 0.5);  // Negative distance = backward
         
         // Start shooter motor at maximum speed
-        if (shooterMotor != null) {
-            shooterMotor.setPower(1.0);
+        if (shooter_motor != null) {
+            shooter_motor.setPower(1.0);
         }
         
         // Shoot 3 balls with barrel rotation
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+                wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
             // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
+           
         }
         
         // First ball pickup row
@@ -355,14 +400,14 @@ public class SimpleAutonomous extends LinearOpMode {
         turnDegrees(-45.0, 0.3);
         
         // Drive forward 25 inches while running intake
-        if (intakeMotor != null) {
-            intakeMotor.setPower(1.0); // Start intake
+        if (intakemotor != null) {
+            intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
         
         // Drive backward 25 inches
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0); // Stop intake
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6); // Back to launch line
         
@@ -373,16 +418,24 @@ public class SimpleAutonomous extends LinearOpMode {
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+                wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
             // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
         }
@@ -395,14 +448,14 @@ public class SimpleAutonomous extends LinearOpMode {
         strafeDistance(-18.0, 0.5);
         
         // Drive forward 25 inches while running intake
-        if (intakeMotor != null) {
-            intakeMotor.setPower(1.0); // Start intake
+        if (intakemotor != null) {
+            intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
         
         // Drive backward 25 inches
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0); // Stop intake
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
         
@@ -416,16 +469,24 @@ public class SimpleAutonomous extends LinearOpMode {
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+                wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
             // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
         }
@@ -438,14 +499,14 @@ public class SimpleAutonomous extends LinearOpMode {
         strafeDistance(-36.0, 0.5);
         
         // Drive forward 25 inches while running intake
-        if (intakeMotor != null) {
-            intakeMotor.setPower(1.0); // Start intake
+        if (intakemotor != null) {
+            intakemotor.setPower(1.0); // Start intake
         }
         driveDistance(25.0, 0.6); // Forward while collecting
         
         // Drive backward 25 inches
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0); // Stop intake
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0); // Stop intake
         }
         driveDistance(-25.0, 0.6);
         
@@ -459,16 +520,24 @@ public class SimpleAutonomous extends LinearOpMode {
         for (int i = 0; i < 3; i++) {
             // Rotate barrel to next position (incremental)
             double barrelPosition = BARREL_POSITIONS[i];
-            if (wheelRotationServo != null) {
-                wheelRotationServo.setPosition(barrelPosition);
+            if (wheel_rotation != null) {
+               wheel_rotation.setPower(150); // Rotate barrel to position
             }
             sleep(500); // Wait for servo to reach position
             
-            // Activate ball pusher to shoot
-            if (ballPushServo != null) {
-                ballPushServo.setPosition(1.0);  // Push position
-                sleep(300); // Hold pusher
-                ballPushServo.setPosition(0.0);  // Retract position
+           // Activate ball pusher to shoot
+            if (kicker_motor != null) {
+                kicker_motor.setPower(-1.0);  // Ensure kicker is retracted before shooting
+                sleep(150); // Hold retraction
+                kicker_motor.setPower(1.0);  // Activate kicker motor
+                sleep(150); // Hold kicker motor
+                kicker_motor.setPower(0.0);  // Stop kicker motor
+                if (grip_servo_left != null && grip_servo_right != null) {
+                    // Open gripper to release any held balls (if needed)
+                    grip_servo_left.setPosition(0.0);  // Open position
+                    grip_servo_right.setPosition(1.0); // Open position
+                    sleep(200); // Wait for gripper to open
+                }
             }
             sleep(200); // Wait for retraction
         }
@@ -481,11 +550,11 @@ public class SimpleAutonomous extends LinearOpMode {
         strafeDistance(-34.0, 0.5);
         
         // Turn off all systems
-        if (shooterMotor != null) {
-            shooterMotor.setPower(0.0);
+        if (shooter_motor != null) {
+            shooter_motor.setPower(0.0);
         }
-        if (intakeMotor != null) {
-            intakeMotor.setPower(0.0);
+        if (intakemotor != null) {
+            intakemotor.setPower(0.0);
         }
     }
     
@@ -502,34 +571,34 @@ public class SimpleAutonomous extends LinearOpMode {
         resetEncoders();
 
         // Set target positions for all motors
-        if (frontLeftMotor != null) frontLeftMotor.setTargetPosition(targetTicks);
-        if (frontRightMotor != null) frontRightMotor.setTargetPosition(targetTicks);
-        if (backLeftMotor != null) backLeftMotor.setTargetPosition(targetTicks);
-        if (backRightMotor != null) backRightMotor.setTargetPosition(targetTicks);
+        if (front_left_motor != null) front_left_motor.setTargetPosition(targetTicks);
+        if (front_right_motor != null) front_right_motor.setTargetPosition(targetTicks);
+        if (back_left_motor != null) back_left_motor.setTargetPosition(targetTicks);
+        if (back_right_motor != null) back_right_motor.setTargetPosition(targetTicks);
 
         // Set motors to run to position
         setRunToPositionMode();
 
         // Set power with correct direction
         double direction = distanceInches >= 0 ? power : -power;
-        if (frontLeftMotor != null) frontLeftMotor.setPower(direction);
-        if (frontRightMotor != null) frontRightMotor.setPower(direction);
-        if (backLeftMotor != null) backLeftMotor.setPower(direction);
-        if (backRightMotor != null) backRightMotor.setPower(direction);
+        if (front_left_motor != null) front_left_motor.setPower(direction);
+        if (front_right_motor != null) front_right_motor.setPower(direction);
+        if (back_left_motor != null) back_left_motor.setPower(direction);
+        if (back_right_motor != null) back_right_motor.setPower(direction);
 
         // Wait until target is reached
         while (opModeIsActive() &&
-               (frontLeftMotor != null && frontLeftMotor.isBusy()) &&
-               (frontRightMotor != null && frontRightMotor.isBusy()) &&
-               (backLeftMotor != null && backLeftMotor.isBusy()) &&
-               (backRightMotor != null && backRightMotor.isBusy())) {
+               (front_left_motor != null && front_left_motor.isBusy()) &&
+               (front_right_motor != null && front_right_motor.isBusy()) &&
+               (back_left_motor != null && back_left_motor.isBusy()) &&
+               (back_right_motor != null && back_right_motor.isBusy())) {
             updateIMUTelemetry();
             telemetry.addData("Driving", "%.1f inches", distanceInches);
             telemetry.addData("Target Ticks", targetTicks);
-            if (frontLeftMotor != null) telemetry.addData("Current FL", frontLeftMotor.getCurrentPosition());
-            if (frontRightMotor != null) telemetry.addData("Current FR", frontRightMotor.getCurrentPosition());
-            if (backLeftMotor != null) telemetry.addData("Current BL", backLeftMotor.getCurrentPosition());
-            if (backRightMotor != null) telemetry.addData("Current BR", backRightMotor.getCurrentPosition());
+            if (front_left_motor != null) telemetry.addData("Current FL", front_left_motor.getCurrentPosition());
+            if (front_right_motor != null) telemetry.addData("Current FR", front_right_motor.getCurrentPosition());
+            if (back_left_motor != null) telemetry.addData("Current BL", back_left_motor.getCurrentPosition());
+            if (back_right_motor != null) telemetry.addData("Current BR", back_right_motor.getCurrentPosition());
             telemetry.update();
             sleep(10);
         }
@@ -553,34 +622,34 @@ public class SimpleAutonomous extends LinearOpMode {
         // For mecanum strafing: left motors move opposite of right motors
         // Right strafe: FL+, FR-, BL-, BR+
         // Left strafe: FL-, FR+, BL+, BR-
-        if (frontLeftMotor != null) frontLeftMotor.setTargetPosition(distanceInches >= 0 ? targetTicks : -targetTicks);
-        if (frontRightMotor != null) frontRightMotor.setTargetPosition(distanceInches >= 0 ? -targetTicks : targetTicks);
-        if (backLeftMotor != null) backLeftMotor.setTargetPosition(distanceInches >= 0 ? -targetTicks : targetTicks);
-        if (backRightMotor != null) backRightMotor.setTargetPosition(distanceInches >= 0 ? targetTicks : -targetTicks);
+        if (front_left_motor != null) front_left_motor.setTargetPosition(distanceInches >= 0 ? targetTicks : -targetTicks);
+        if (front_right_motor != null) front_right_motor.setTargetPosition(distanceInches >= 0 ? -targetTicks : targetTicks);
+        if (back_left_motor != null) back_left_motor.setTargetPosition(distanceInches >= 0 ? -targetTicks : targetTicks);
+        if (back_right_motor != null) back_right_motor.setTargetPosition(distanceInches >= 0 ? targetTicks : -targetTicks);
 
         // Set motors to run to position
         setRunToPositionMode();
 
         // Set power with correct direction
         double absPower = Math.abs(power);
-        if (frontLeftMotor != null) frontLeftMotor.setPower(distanceInches >= 0 ? absPower : -absPower);
-        if (frontRightMotor != null) frontRightMotor.setPower(distanceInches >= 0 ? -absPower : absPower);
-        if (backLeftMotor != null) backLeftMotor.setPower(distanceInches >= 0 ? -absPower : absPower);
-        if (backRightMotor != null) backRightMotor.setPower(distanceInches >= 0 ? absPower : -absPower);
+        if (front_left_motor != null) front_left_motor.setPower(distanceInches >= 0 ? absPower : -absPower);
+        if (front_right_motor != null) front_right_motor.setPower(distanceInches >= 0 ? -absPower : absPower);
+        if (back_left_motor != null) back_left_motor.setPower(distanceInches >= 0 ? -absPower : absPower);
+        if (back_right_motor != null) back_right_motor.setPower(distanceInches >= 0 ? absPower : -absPower);
 
         // Wait until target is reached
         while (opModeIsActive() &&
-               (frontLeftMotor != null && frontLeftMotor.isBusy()) &&
-               (frontRightMotor != null && frontRightMotor.isBusy()) &&
-               (backLeftMotor != null && backLeftMotor.isBusy()) &&
-               (backRightMotor != null && backRightMotor.isBusy())) {
+               (front_left_motor != null && front_left_motor.isBusy()) &&
+               (front_right_motor != null && front_right_motor.isBusy()) &&
+               (back_left_motor != null && back_left_motor.isBusy()) &&
+               (back_right_motor != null && back_right_motor.isBusy())) {
             updateIMUTelemetry();
             telemetry.addData("Strafing", "%.1f inches", distanceInches);
             telemetry.addData("Target Ticks", targetTicks);
-            if (frontLeftMotor != null) telemetry.addData("Current FL", frontLeftMotor.getCurrentPosition());
-            if (frontRightMotor != null) telemetry.addData("Current FR", frontRightMotor.getCurrentPosition());
-            if (backLeftMotor != null) telemetry.addData("Current BL", backLeftMotor.getCurrentPosition());
-            if (backRightMotor != null) telemetry.addData("Current BR", backRightMotor.getCurrentPosition());
+            if (front_left_motor != null) telemetry.addData("Current FL", front_left_motor.getCurrentPosition());
+            if (front_right_motor != null) telemetry.addData("Current FR", front_right_motor.getCurrentPosition());
+            if (back_left_motor != null) telemetry.addData("Current BL", back_left_motor.getCurrentPosition());
+            if (back_right_motor != null) telemetry.addData("Current BR", back_right_motor.getCurrentPosition());
             telemetry.update();
             sleep(10);
         }
@@ -616,16 +685,16 @@ public class SimpleAutonomous extends LinearOpMode {
         double turnPower = Math.abs(power);
         if (degrees < 0) {
             // Turn counterclockwise: left motors go backward, right motors go forward
-            if (frontLeftMotor != null) frontLeftMotor.setPower(-turnPower);
-            if (frontRightMotor != null) frontRightMotor.setPower(turnPower);
-            if (backLeftMotor != null) backLeftMotor.setPower(-turnPower);
-            if (backRightMotor != null) backRightMotor.setPower(turnPower);
+            if (front_left_motor != null) front_left_motor.setPower(-turnPower);
+            if (front_right_motor != null) front_right_motor.setPower(turnPower);
+            if (back_left_motor != null) back_left_motor.setPower(-turnPower);
+            if (back_right_motor != null) back_right_motor.setPower(turnPower);
         } else {
             // Turn clockwise: left motors go forward, right motors go backward
-            if (frontLeftMotor != null) frontLeftMotor.setPower(turnPower);
-            if (frontRightMotor != null) frontRightMotor.setPower(-turnPower);
-            if (backLeftMotor != null) backLeftMotor.setPower(turnPower);
-            if (backRightMotor != null) backRightMotor.setPower(-turnPower);
+            if (front_left_motor != null) front_left_motor.setPower(turnPower);
+            if (front_right_motor != null) front_right_motor.setPower(-turnPower);
+            if (back_left_motor != null) back_left_motor.setPower(turnPower);
+            if (back_right_motor != null) back_right_motor.setPower(-turnPower);
         }
         
         // Continue turning until we reach the target heading
@@ -661,39 +730,39 @@ public class SimpleAutonomous extends LinearOpMode {
      * Reset all drive motor encoders
      */
     private void resetEncoders() {
-        if (frontLeftMotor != null) frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        if (frontRightMotor != null) frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        if (backLeftMotor != null) backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        if (backRightMotor != null) backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if (front_left_motor != null) front_left_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if (front_right_motor != null) front_right_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if (back_left_motor != null) back_left_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if (back_right_motor != null) back_right_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         
         // Small delay to allow reset to complete
         sleep(50);
         
         // Set back to run using encoder mode
-        if (frontLeftMotor != null) frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (frontRightMotor != null) frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (backLeftMotor != null) backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (backRightMotor != null) backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (front_left_motor != null) front_left_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (front_right_motor != null) front_right_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (back_left_motor != null) back_left_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (back_right_motor != null) back_right_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     
     /**
      * Set all drive motors to run to position mode
      */
     private void setRunToPositionMode() {
-        if (frontLeftMotor != null) frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (frontRightMotor != null) frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (backLeftMotor != null) backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (backRightMotor != null) backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (front_left_motor != null) front_left_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (front_right_motor != null) front_right_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (back_left_motor != null) back_left_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (back_right_motor != null) back_right_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     
     /**
      * Stop all drive motors
      */
     private void stopDriveMotors() {
-        if (frontLeftMotor != null) frontLeftMotor.setPower(0);
-        if (frontRightMotor != null) frontRightMotor.setPower(0);
-        if (backLeftMotor != null) backLeftMotor.setPower(0);
-        if (backRightMotor != null) backRightMotor.setPower(0);
+        if (front_left_motor != null) front_left_motor.setPower(0);
+        if (front_right_motor != null) front_right_motor.setPower(0);
+        if (back_left_motor != null) back_left_motor.setPower(0);
+        if (back_right_motor != null) back_right_motor.setPower(0);
     }
     
     /**
