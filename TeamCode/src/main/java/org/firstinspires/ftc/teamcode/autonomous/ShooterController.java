@@ -228,4 +228,26 @@ public class ShooterController {
     public double getShooterPower() {
         return shooterMotor.getPower();
     }
+    
+    /**
+     * Checks if the shooter is currently running forward
+     * @return true if shooter is running forward, false otherwise
+     */
+    public boolean isShootingForward() {
+        if (shooterMotor != null) {
+            return shooterMotor.getPower() > 0;
+        }
+        return false;
+    }
+    
+    /**
+     * Checks if the shooter is currently running in reverse
+     * @return true if shooter is running in reverse, false otherwise
+     */
+    public boolean isShootingReverse() {
+        if (shooterMotor != null) {
+            return shooterMotor.getPower() < 0;
+        }
+        return false;
+    }
 }
