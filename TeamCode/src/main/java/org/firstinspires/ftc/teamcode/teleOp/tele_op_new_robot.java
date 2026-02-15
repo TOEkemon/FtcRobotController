@@ -234,20 +234,19 @@ public class tele_op_new_robot extends LinearOpMode {
       //inertia for ball to be at trigger
       if (front_left_motor != null && front_right_motor != null && back_left_motor != null && back_right_motor != null) {
           if (gamepad1.right_bumper && !rightBumperPressed) {
-            front_left_motor.setPower(-1); // go back to push ball
-            front_right_motor.setPower(-1); 
-            back_left_motor.setPower(-1);
-            back_right_motor.setPower(-1);
-            sleep(50);
-            front_left_motor.setPower(0); // go forward to move ball t rtigger
-            front_right_motor.setPower(0); 
-            back_left_motor.setPower(0);
-            back_right_motor.setPower(0);
-            sleep(50);
+             front_left_motor.setPower(-1); // go back to push ball
+             front_right_motor.setPower(-1); 
+             back_left_motor.setPower(-1);
+             back_right_motor.setPower(-1);
+             sleep(50);
+             front_left_motor.setPower(0); // go forward to move ball t rtigger
+             front_right_motor.setPower(0); 
+             back_left_motor.setPower(0);
+             back_right_motor.setPower(0);
+             sleep(50);
 
           }
       }
-
       // Handle shooter motor and gripper servos with triggers
       boolean rightTriggerPressed = gamepad1.right_trigger > 0.5;
       boolean leftTriggerPressed = gamepad1.left_trigger > 0.5;
