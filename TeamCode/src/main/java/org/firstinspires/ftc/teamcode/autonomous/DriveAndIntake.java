@@ -67,7 +67,7 @@ public class DriveAndIntake {
    int offset = 39;
 
 
-   double currentDraw = intakeMotor.getCurrent(CurrentUnit.AMPS);
+   double currentDraw = 0.0;
 
     public int getCenterX() {
         return centerX;
@@ -87,7 +87,11 @@ public class DriveAndIntake {
 
 
    // Constructor
-   /*public DriveAndIntake(
+   public DriveAndIntake(DcMotorEx intakeMotor) {
+       this.intakeMotor = intakeMotor;
+   }
+
+   public DriveAndIntake(
            DcMotor fl,
            DcMotor fr,
            DcMotor bl,
@@ -99,7 +103,7 @@ public class DriveAndIntake {
        this.backLeftMotor = bl;
        this.backRightMotor = br;
        this.intakeMotor = intake;
-   }*/
+   }
 
 
 
@@ -119,7 +123,7 @@ public class DriveAndIntake {
        double maxArea = 0;   // RESET EVERY FRAME
        MatOfPoint largestContour = null;
 
-       Moments moments = Imgproc.moments(largestContour);
+       Moments moments; // Declaration only to avoid NullPointerException as largestContour is null here
 
 
 

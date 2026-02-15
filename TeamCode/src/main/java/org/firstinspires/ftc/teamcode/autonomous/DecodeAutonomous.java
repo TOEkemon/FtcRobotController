@@ -266,9 +266,7 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
        //instance with constructor so opmode knows what motors to use
-       driveAndIntake = new DriveAndIntake(
-
-       );
+       driveAndIntake = new DriveAndIntake(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor);
 
 
        //gives driveAndIntake contour and camera values
@@ -735,7 +733,7 @@ public class DecodeAutonomous extends LinearOpMode {
                //instance with constructor so opmode knows what motors to use
                // Note: DriveAndIntake constructor has been updated to not require color sensor
                if (driveAndIntake == null) {
-                   driveAndIntake = new DriveAndIntake();
+                   driveAndIntake = new DriveAndIntake(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor, intakeMotor);
                }
 
                List<MatOfPoint> contours = pipeline.getAllContours();
