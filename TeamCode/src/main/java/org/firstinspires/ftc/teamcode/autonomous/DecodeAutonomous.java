@@ -623,89 +623,89 @@ public class DecodeAutonomous extends LinearOpMode {
                // Determine target coordinates based on alliance and current row index
                if (isRedAlliance) {
                    if (isNearSide) {
-                       // Red Near Side - use Red Near Spike Mark coordinates
+                       // Red Near Side - use Red Spike Mark coordinates
                        switch (currentRowIndex) {
-                           case 0: // Near Spike Mark (Audience side)
-                               targetX = 48.0 - 9.0; // X coordinate for red near spike, adjusted for 18" robot (9" offset)
-                               targetY = -36.0 - 9.0; // Y coordinate for red near spike, adjusted for 18" robot (9" offset)
+                           case 0: // Near Spike Mark (Audience side) - y = -36
+                               targetX = 48.0 -9.0; // X coordinate for red near spike (from coordinates: y = -36 { 43 < x < 53 })
+                               targetY = -36.0 -9.0; // Y coordinate for red near spike, adjusted for 18" robot (9" offset)
                                break;
-                           case 1: // Far Spike Mark (GOAL side)
-                               targetX = 48.0 - 9.0; // X coordinate for red far spike, adjusted for 18" robot (9" offset)
-                               targetY = 36.0 - 9.0; // Y coordinate for red far spike, adjusted for 18" robot (9" offset)
+                           case 1: // Middle Spike Mark (Center) - y = -12
+                               targetX = 48.0 -9.0; // X coordinate for red middle spike (from coordinates: y = -12 { 43 < x < 53 })
+                               targetY = -12.0 -9.0; // Y coordinate for red middle spike, adjusted for 18" robot (9" offset)
                                break;
-                           case 2: // Middle Spike Mark (Center)
-                               targetX = 48.0 - 9.0; // X coordinate for red middle spike, adjusted for 18" robot (9" offset)
-                               targetY = 0.0; // Y coordinate for red middle spike (center doesn't need adjustment)
+                           case 2: // Far Spike Mark (GOAL side) - y = 12
+                               targetX = 48.0 -9.0; // X coordinate for red far spike (from coordinates: y = 12 { 43 < x < 53 })
+                               targetY = 12.0 -9.0; // Y coordinate for red far spike, adjusted for 18" robot (9" offset)
                                break;
                            default:
                                // Default to near spike if invalid index
-                               targetX = 48.0 - 9.0;
-                               targetY = -36.0 - 9.0;
+                               targetX = 48.0 -9.0;
+                               targetY = -36.0 -9.0;
                                break;
                        }
                    } else {
-                       // Red Far Side - use Red Far Spike Mark coordinates
+                       // Red Far Side - use Red Spike Mark coordinates
                        switch (currentRowIndex) {
-                           case 0: // Near Spike Mark (Audience side)
-                               targetX = 48.0 - 9.0; // X coordinate for red near spike, adjusted for 18" robot (9" offset)
-                               targetY = -36.0 - 9.0; // Y coordinate for red near spike, adjusted for 18" robot (9" offset)
+                           case 0: // Far Spike Mark (GOAL side) - y = -36
+                               targetX = 48.0 -9.0; // X coordinate for red far spike (from coordinates: y = -36 { 43 < x < 53 })
+                               targetY = -36.0 -9.0; // Y coordinate for red far spike, adjusted for 18" robot (9" offset)
                                break;
-                           case 1: // Far Spike Mark (GOAL side)
-                               targetX = 48.0 - 9.0; // X coordinate for red far spike, adjusted for 18" robot (9" offset)
-                               targetY = 36.0 - 9.0; // Y coordinate for red far spike, adjusted for 18" robot (9" offset)
+                           case 1: // Middle Spike Mark (Center) - y = -12
+                               targetX = 48.0 -9.0; // X coordinate for red middle spike (from coordinates: y = -12 { 43 < x < 53 })
+                               targetY = -12.0 -9.0; // Y coordinate for red middle spike, adjusted for 18" robot (9" offset)
                                break;
-                           case 2: // Middle Spike Mark (Center)
-                               targetX = 48.0 - 9.0; // X coordinate for red middle spike, adjusted for 18" robot (9" offset)
-                               targetY = 0.0; // Y coordinate for red middle spike (center doesn't need adjustment)
+                           case 2: // Near Spike Mark (Audience side) - y = 12
+                               targetX = 48.0 -9.0; // X coordinate for red near spike (from coordinates: y = 12 { 43 < x < 53 })
+                               targetY = 12.0 -9.0; // Y coordinate for red near spike, adjusted for 18" robot (9" offset)
                                break;
                            default:
-                               // Default to near spike if invalid index
-                               targetX = 48.0 - 9.0;
-                               targetY = -36.0 - 9.0;
+                               // Default to far spike if invalid index
+                               targetX = 48.0 -9.0;
+                               targetY = -36.0 -9.0;
                                break;
                        }
                    }
                } else {
                    if (isNearSide) {
-                       // Blue Near Side - use Blue Near Spike Mark coordinates
+                       // Blue Near Side - use Blue Spike Mark coordinates
                        switch (currentRowIndex) {
-                           case 0: // Near Spike Mark (Audience side)
-                               targetX = -48.0 + 9.0; // X coordinate for blue near spike (mirrored), adjusted for 18" robot (9" offset)
-                               targetY = 36.0 + 9.0; // Y coordinate for blue near spike (mirrored), adjusted for 18" robot (9" offset)
+                           case 0: // Near Spike Mark (Audience side) - y = -36
+                               targetX = -48.0 + 9.0; // X coordinate for blue near spike (from coordinates: y = -36 { -53 < x < -43 })
+                               targetY = -36.0 + 9.0; // Y coordinate for blue near spike (mirrored), adjusted for 18" robot (9" offset)
                                break;
-                           case 1: // Far Spike Mark (GOAL side)
-                               targetX = -48.0 + 9.0; // X coordinate for blue far spike (mirrored), adjusted for 18" robot (9" offset)
-                               targetY = -36.0 + 9.0; // Y coordinate for blue far spike (mirrored), adjusted for 18" robot (9" offset)
+                           case 1: // Middle Spike Mark (Center) - y = -12
+                               targetX = -48.0 + 9.0; // X coordinate for blue middle spike (from coordinates: y = -12 { -53 < x < -43 })
+                               targetY = -12.0 + 9.0; // Y coordinate for blue middle spike (mirrored), adjusted for 18" robot (9" offset)
                                break;
-                           case 2: // Middle Spike Mark (Center)
-                               targetX = -48.0 + 9.0; // X coordinate for blue middle spike (mirrored), adjusted for 18" robot (9" offset)
-                               targetY = 0.0; // Y coordinate for blue middle spike (center doesn't need adjustment)
+                           case 2: // Far Spike Mark (GOAL side) - y = 12
+                               targetX = -48.0 + 9.0; // X coordinate for blue far spike (from coordinates: y = 12 { -53 < x < -43 })
+                               targetY = 12.0 + 9.0; // Y coordinate for blue far spike (mirrored), adjusted for 18" robot (9" offset)
                                break;
                            default:
                                // Default to near spike if invalid index
                                targetX = -48.0 + 9.0;
-                               targetY = 36.0 + 9.0;
+                               targetY = -36.0 + 9.0;
                                break;
                        }
                    } else {
-                       // Blue Far Side - use Blue Far Spike Mark coordinates
+                       // Blue Far Side - use Blue Spike Mark coordinates
                        switch (currentRowIndex) {
-                           case 0: // Near Spike Mark (Audience side)
-                               targetX = -48.0 + 9.0; // X coordinate for blue near spike (mirrored), adjusted for 18" robot (9" offset)
-                               targetY = 36.0 + 9.0; // Y coordinate for blue near spike (mirrored), adjusted for 18" robot (9" offset)
-                               break;
-                           case 1: // Far Spike Mark (GOAL side)
-                               targetX = -48.0 + 9.0; // X coordinate for blue far spike (mirrored), adjusted for 18" robot (9" offset)
+                           case 0: // Far Spike Mark (GOAL side) - y = -36
+                               targetX = -48.0 + 9.0; // X coordinate for blue far spike (from coordinates: y = -36 { -53 < x < -43 })
                                targetY = -36.0 + 9.0; // Y coordinate for blue far spike (mirrored), adjusted for 18" robot (9" offset)
                                break;
-                           case 2: // Middle Spike Mark (Center)
-                               targetX = -48.0 + 9.0; // X coordinate for blue middle spike (mirrored), adjusted for 18" robot (9" offset)
-                               targetY = 0.0; // Y coordinate for blue middle spike (center doesn't need adjustment)
+                           case 1: // Middle Spike Mark (Center) - y = -12
+                               targetX = -48.0 + 9.0; // X coordinate for blue middle spike (from coordinates: y = -12 { -53 < x < -43 })
+                               targetY = -12.0 + 9.0; // Y coordinate for blue middle spike (mirrored), adjusted for 18" robot (9" offset)
+                               break;
+                           case 2: // Near Spike Mark (Audience side) - y = 12
+                               targetX = -48.0 + 9.0; // X coordinate for blue near spike (from coordinates: y = 12 { -53 < x < -43 })
+                               targetY = 12.0 + 9.0; // Y coordinate for blue near spike (mirrored), adjusted for 18" robot (9" offset)
                                break;
                            default:
-                               // Default to near spike if invalid index
+                               // Default to far spike if invalid index
                                targetX = -48.0 + 9.0;
-                               targetY = 36.0 + 9.0;
+                               targetY = -36.0 + 9.0;
                                break;
                        }
                    }
@@ -828,40 +828,28 @@ public class DecodeAutonomous extends LinearOpMode {
 
 
            case DRIVE_TO_LINE:
-               // Positioning phase: drive back to the launch line for shooting using coordinates
-               double launchLineX = 0.0;
-               double launchLineY = 0.0;
+               // Positioning phase: drive to shooting position using coordinates
+               double shootingPositionX = 0.0;
+               double shootingPositionY = 0.0;
 
-               // Determine launch line coordinates based on alliance and side
+               // Determine shooting position coordinates based on alliance
                if (isRedAlliance) {
-                   if (isNearSide) {
-                       // Red Near Launch Line (Right Lower Launch Line segment: y = -x - 48, x from 0 to 24)
-                       launchLineX = 12.0; // Midpoint of launch line segment for Red-Near
-                       launchLineY = -60.0; // Calculated from y = -x - 48 when x = 12
-                   } else {
-                       // Red Far Launch Line (Right Upper Launch Line segment: y = x, x from 0 to 58.2)
-                       launchLineX = 29.1; // Midpoint of launch line segment for Red-Far
-                       launchLineY = 29.1; // Calculated from y = x when x = 29.1
-                   }
+                   // Red shooting position
+                   shootingPositionX = 11.0; // X coordinate for red shooting position
+                   shootingPositionY = 11.0; // Y coordinate for red shooting position
                } else {
-                   if (isNearSide) {
-                       // Blue Near Launch Line (Left Lower Launch Line segment: y = x - 48, x from -24 to 0)
-                       launchLineX = -12.0; // Midpoint of launch line segment for Blue-Near
-                       launchLineY = -60.0; // Calculated from y = x - 48 when x = -12
-                   } else {
-                       // Blue Far Launch Line (Left Upper Launch Line segment: y = -x, x from -58.2 to 0)
-                       launchLineX = -29.1; // Midpoint of launch line segment for Blue-Far
-                       launchLineY = 29.1; // Calculated from y = -x when x = -29.1
-                   }
+                   // Blue shooting position (mirrored)
+                   shootingPositionX = -11.0; // X coordinate for blue shooting position (mirrored)
+                   shootingPositionY = 11.0; // Y coordinate for blue shooting position
                }
 
-               // Drive to calculated launch line position using coordinate navigation
-               moveRobotToPosition(launchLineX, launchLineY);
+               // Drive to calculated shooting position using coordinate navigation
+               moveRobotToPosition(shootingPositionX, shootingPositionY);
 
-               // Check if we've reached the launch line
-               double distanceToLaunchLine = Math.sqrt(Math.pow(currentX - launchLineX, 2) + Math.pow(currentY - launchLineY, 2));
-               if (distanceToLaunchLine < 5.0) { // Within 5 inches tolerance
-                   // Successfully positioned at launch line, begin shooting sequence
+               // Check if we've reached the shooting position
+               double distanceToShootingPosition = Math.sqrt(Math.pow(currentX - shootingPositionX, 2) + Math.pow(currentY - shootingPositionY, 2));
+               if (distanceToShootingPosition < 5.0) { // Within 5 inches tolerance
+                   // Successfully positioned at shooting position, begin shooting sequence
                    currentState = AutonomousState.SHOOT;
                }
                break;
