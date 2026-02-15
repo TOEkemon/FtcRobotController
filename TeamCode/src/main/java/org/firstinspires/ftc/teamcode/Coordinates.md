@@ -96,8 +96,8 @@ polygon((0, 0), (-58, 58), (-48, 72), (48, 72), (58, 58))
 --- FOLDER: Launch Zone Near Loading ---
 polygon((-24, -72), (0, -48), (24, -72))
 
---- FOLDER: Red Field Side ---
+--- FOLDER: Blue Field Side ---
 polygon((-72, 72), (0, 72), (0, -72), (-72, -72))
 
---- FOLDER: Blue Field Side ---
+--- FOLDER: Red Field Side ---
 polygon((72, 72), (0, 72), (0, -72), (72, -72))
