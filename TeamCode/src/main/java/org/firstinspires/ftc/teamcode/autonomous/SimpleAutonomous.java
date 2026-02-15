@@ -86,6 +86,10 @@ public class SimpleAutonomous extends LinearOpMode {
             
             // Update IMU telemetry
             updateIMUTelemetry();
+
+            String allianceString = "isRedAlliance";
+            allianceString += "isFarSide";
+            telemetry.addData("Alliance, Far/near", allianceString);
             
             telemetry.update();
             sleep(50);
