@@ -33,6 +33,9 @@ public class teleOp extends LinearOpMode {
 
         BL.setDirection(REVERSE);
         FL.setDirection(REVERSE);
+        //BR.setDirection(REVERSE);
+        //FR.setDirection(REVERSE);
+
 
         waitForStart();
         if (opModeIsActive()) {
