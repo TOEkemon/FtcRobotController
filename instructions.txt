@@ -1,0 +1,8 @@
+This is how to use a teleOp:
+
+Since the robot is simple right now (and the other file isn't quite configured) use 'workableTeleOp'.
+It is super simple, but should be able to drive around with the joysticks. It should be that left joystick is direction to move in, while right joystick is heading.
+If it doesn't work, you can find code online, or analyze the what the wheels are doing when you go forward and figure out what code changes would fix it. Before anything, 
+try reversing the direction of the motors, or flipping the sign of the controller values (they're called like gamepad_x and gamepad_y or something).
+
+Make sure that your driver station is using gamepad_1.
