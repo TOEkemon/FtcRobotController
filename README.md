@@ -1,3 +1,7 @@
+## THIS IS A PRIVATE SCHOOL'S ROBOTCIS TEAM REPO
+
+## ANYWAY, IF YOU NEED HELP LOOK AT 'instructions.txt'
+
 ## NOTICE
 
 This repository contains the public FTC SDK for the BIOBUZZ (2026-2027) competition season.
