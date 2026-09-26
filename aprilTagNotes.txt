@@ -1,0 +1,16 @@
+General outline for making an april tag processor:
+
+Make objects of VisionPortal and AprilTagProcessor:
+AprilTagProcessor.Builder() to set custom parameters and settings
+VisionPortal.Builder() is fed the AprilTagProcessor we made and the physical webcam with hardwareMap
+Use getDetections() with aprilTagProcessor for possible objects
+Use for loop to iterate through detections
+Check detections to see if it's what we're looking for and use its data
+
+NOTE: SAMPLE CODE CAN BE FOUND:
+
+FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples/ConceptAprilTag.java
+
+or
+
+FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples/ConceptAprilTagEasy.java
