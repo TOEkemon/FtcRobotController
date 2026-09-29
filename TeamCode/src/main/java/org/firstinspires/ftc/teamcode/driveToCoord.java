@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 //system for driving to coordinates
 
 //this may go in the main autonomous file due to its amount of interactions with the hardware
@@ -51,6 +55,7 @@ public class driveToCoord extends LinearOpMode {
 
     private IMU imu;
 
+    String telemetryMessage = "Enter Starting Heading:";
 
     //dimensions are 360*360, actual is 12*12ft on real field
     final int fieldX = 360;
@@ -331,7 +336,8 @@ public class driveToCoord extends LinearOpMode {
 
         while (opModeInInit()) {
             //may need to loop to get starting heading, but this is a good start
-            telemetry.addData("Enter starting heading"); //idk why this is an error
+            //this probably isnt allowed by rules
+            telemetry.addData("", telemetryMessage); //must have at least 2 strings
             telemetry.update();
             if (gamepad1.a) {
                 startingHeading = 90;
@@ -361,6 +367,7 @@ public class driveToCoord extends LinearOpMode {
                 robotOrientation = imu.getRobotYawPitchRollAngles();
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw+startingHeading;
+
                 
             }
         }
