@@ -340,6 +340,7 @@ public class driveToCoord extends LinearOpMode {
          */
 
         //calculate average so that it does each motor the right amount.
+        //ticks dont scale at the same speed because to go soem diretions, it doesnt go forward, it actually goes backwards.
         double tickAverage = (BL.getCurrentPosition() + BR.getCurrentPosition()+ FR.getCurrentPosition()+ FL.getCurrentPosition()) / 4;
         double rawTickDistance = (hypotenuse / 2.5) * ticksPerInch; //2.5 = 360/144, so its inches * ticksPerInch
         double ticksToGo = tickAverage + rawTickDistance;
