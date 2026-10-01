@@ -16,6 +16,11 @@ public class testForTicks extends LinearOpMode {
     private DcMotor FL;
     private DcMotor FR;
 
+    int flpos;
+    int frpos;
+    int blpos;
+    int brpos;
+
 
 
 
@@ -36,6 +41,15 @@ public class testForTicks extends LinearOpMode {
         //BR.setDirection(REVERSE);
         //FR.setDirection(REVERSE);
 
+        BL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         waitForStart();
         if (opModeIsActive()) {
@@ -55,10 +69,22 @@ public class testForTicks extends LinearOpMode {
                 double frontRightPow = (y - x - rx) / denominator;
                 double backRightPow = (y + x - rx) / denominator;
 
-                FL.setPower(frontLeftPow);
-                FR.setPower(frontRightPow);
-                BL.setPower(backLeftPow);
-                BR.setPower(backRightPow);
+                FL.setPower(frontLeftPow / 4);
+                FR.setPower(frontRightPow / 4);
+                BL.setPower(backLeftPow / 4);
+                BR.setPower(backRightPow / 4);
+
+                flpos = FL.getCurrentPosition();
+                frpos = FR.getCurrentPosition();
+                blpos = BL.getCurrentPosition();
+                brpos = BR.getCurrentPosition();
+
+                telemetry.addData("", flpos);
+                telemetry.addData("", frpos);
+                telemetry.addData("", blpos);
+                telemetry.addData("", brpos);
+                telemetry.update();
+
             }
         }
     }

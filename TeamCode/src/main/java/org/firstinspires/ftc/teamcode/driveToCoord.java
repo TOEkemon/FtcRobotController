@@ -274,8 +274,8 @@ public class driveToCoord extends LinearOpMode {
          */
 
 
-        double ticksToGo = (hypotenuse / 2.5) * ticksPerInch; //2.5 = 360/144, so its inches * ticksPerInch
-
+        double rawTickDistance = (hypotenuse / 2.5) * ticksPerInch; //2.5 = 360/144, so its inches * ticksPerInch
+        double ticksToGo = BL.getCurrentPosition() + rawTickDistance;
         //checks if goal has been met
         while ((ticksToGo != BL.getCurrentPosition()) || (ticksToGo != FL.getCurrentPosition()) || (ticksToGo != BR.getCurrentPosition()) || (ticksToGo != FR.getCurrentPosition())) { //idk if getCurrentPosition will update automatically, different way of checking goal may be needed
             BL.setTargetPosition((int) ticksToGo);
