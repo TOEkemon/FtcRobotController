@@ -450,6 +450,7 @@ public class driveToCoord extends LinearOpMode {
         }
         
         if (opModeIsActive()) {
+            driveToCoord(90, 0, 0, 90, 90);
             while (opModeIsActive()) {
                 //update all variables
                 robotOrientation = imu.getRobotYawPitchRollAngles();
@@ -457,6 +458,10 @@ public class driveToCoord extends LinearOpMode {
                 currentFieldHeading = yaw+startingHeading;
 
                 //april tag & camera method
+                telemetry.addData("xyz: ", robotOrientation);
+                telemetry.addData("averageTickCount: ", tickAverage);
+                telemetry.update();
+
 
                 
             }
