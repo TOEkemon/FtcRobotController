@@ -391,8 +391,8 @@ public class driveToCoord extends LinearOpMode {
         BR = hardwareMap.get(DcMotor.class, "drive_back_right");
         FL = hardwareMap.get(DcMotor.class, "drive_front_left");
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
-        intakemotor = hardwareMap.get(DcMotor.class, "intake_motor");
-        turret = hardwareMap.get(Servo.class, "turret");
+        intakemotor = hardwareMap.get(DcMotor.class, "intake");
+        //turret = hardwareMap.get(Servo.class, "turret");
 
         IMU.Parameters myIMUparameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
@@ -443,7 +443,7 @@ public class driveToCoord extends LinearOpMode {
              */
 
         }
-        
+
         if (opModeIsActive()) {
             driveToCoord(90, 0, 0, 90, 90);
             while (opModeIsActive()) {
@@ -458,7 +458,7 @@ public class driveToCoord extends LinearOpMode {
                 telemetry.update();
 
 
-                
+
             }
         }
 

@@ -32,8 +32,8 @@ public class bioTeleOp extends LinearOpMode {
         BR = hardwareMap.get(DcMotor.class, "drive_back_right");
         FL = hardwareMap.get(DcMotor.class, "drive_front_left");
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
-        intakemotor = hardwareMap.get(DcMotor.class, "intake_motor");
-        turret = hardwareMap.get(Servo.class, "turret");
+        intakemotor = hardwareMap.get(DcMotor.class, "intake");
+        //turret = hardwareMap.get(Servo.class, "turret");
 
 
 
@@ -83,12 +83,12 @@ public class bioTeleOp extends LinearOpMode {
                 if (!gamepad1.left_trigger_pressed) {
                     intakemotor.setPower(0);
                 }
-                if (gamepad1.dpadLeftWasPressed()) {
-                    turret.setPosition(currentTurret + .05);
-                }
-                if (gamepad1.dpadRightWasPressed()) {
-                    turret.setPosition(currentTurret - .05);
-                }
+                //if (gamepad1.dpadLeftWasPressed()) {
+                //turret.setPosition(currentTurret + .05);
+                //}
+                //if (gamepad1.dpadRightWasPressed()) {
+                //turret.setPosition(currentTurret - .05);
+                //}
             }
         }
     }
