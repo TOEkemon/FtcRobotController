@@ -144,7 +144,7 @@ public class driveToCoord extends LinearOpMode {
     }
 
     //moves robot to specificed coords
-    public void driveToCoord(double trueNorth, double currentX, double currentY, double goalX,
+    public void driveToCoords(double trueNorth, double currentX, double currentY, double goalX,
                              double goalY) {
 
         robotOrientation = imu.getRobotYawPitchRollAngles();
@@ -392,6 +392,7 @@ public class driveToCoord extends LinearOpMode {
         FL = hardwareMap.get(DcMotor.class, "drive_front_left");
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
+        imu = hardwareMap.get(IMU.class, "imu");
         //turret = hardwareMap.get(Servo.class, "turret");
 
         IMU.Parameters myIMUparameters = new IMU.Parameters(
@@ -445,7 +446,7 @@ public class driveToCoord extends LinearOpMode {
         }
 
         if (opModeIsActive()) {
-            driveToCoord(90, 0, 0, 90, 90);
+            driveToCoords(90, 0, 0, 90, 90);
             while (opModeIsActive()) {
                 //update all variables
                 robotOrientation = imu.getRobotYawPitchRollAngles();
