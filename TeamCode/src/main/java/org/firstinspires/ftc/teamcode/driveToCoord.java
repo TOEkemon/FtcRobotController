@@ -144,7 +144,7 @@ public class driveToCoord extends LinearOpMode {
     }
 
     //moves robot to specificed coords
-    public void driveToCoords(double trueNorth, double currentX, double currentY, double goalX,
+    public void driveToCoords(double currentX, double currentY, double goalX,
                              double goalY) {
 
         robotOrientation = imu.getRobotYawPitchRollAngles();
@@ -162,7 +162,8 @@ public class driveToCoord extends LinearOpMode {
             yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
             currentFieldHeading = yaw + startingHeading;
             //UPDATE currentFieldHeading AT END OF METHOD
-            if (reverseConvert(currentFieldHeading) == 90) {
+            //error margin
+            if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
                 FL.setPower(0);
                 BR.setPower(0);
                 BL.setPower(0);
@@ -196,7 +197,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) == 90) {
+                if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
                     FL.setPower(0);
                     BR.setPower(0);
                     BL.setPower(0);
@@ -219,7 +220,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) == 90) {
+                if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
                     FL.setPower(0);
                     BR.setPower(0);
                     BL.setPower(0);
@@ -240,7 +241,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) == 90) {
+                if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
                     FL.setPower(0);
                     BR.setPower(0);
                     BL.setPower(0);
@@ -262,7 +263,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) == 90) {
+                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+11) {
                     FL.setPower(0);
                     BR.setPower(0);
                     BL.setPower(0);
@@ -283,7 +284,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) == 90) {
+                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+1) {
                     FL.setPower(0);
                     BR.setPower(0);
                     BL.setPower(0);
@@ -304,7 +305,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) == 90) {
+                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+1) {
                     FL.setPower(0);
                     BR.setPower(0);
                     BL.setPower(0);
@@ -325,7 +326,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) == 90) {
+                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+1) {
                     FL.setPower(0);
                     BR.setPower(0);
                     BL.setPower(0);
@@ -365,10 +366,10 @@ public class driveToCoord extends LinearOpMode {
             BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            BL.setPower(.5);
-            FL.setPower(.5);
-            BR.setPower(.5);
-            FR.setPower(.5);
+            BL.setPower(.1);
+            FL.setPower(.1);
+            BR.setPower(.1);
+            FR.setPower(.1);
             if (targetTicks > (tickAverage-2) && targetTicks < (tickAverage+2)) {
                 FR.setPower(0);
                 FL.setPower(0);
@@ -446,7 +447,7 @@ public class driveToCoord extends LinearOpMode {
         }
 
         if (opModeIsActive()) {
-            driveToCoords(90, 0, 0, 90, 90);
+            driveToCoords(0, 0, 90, 90);
             while (opModeIsActive()) {
                 //update all variables
                 robotOrientation = imu.getRobotYawPitchRollAngles();
