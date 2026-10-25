@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.naviagation.Pose2D;
 
 
 @Autonomous
-(name = "TurretShooter", group ="automonous")
+(name = "AutoTurret", group ="automonous")
 public class AutoTurretShooter {
 
     private Servo gateServo, hoodServo;;
@@ -30,7 +30,7 @@ public class AutoTurretShooter {
 
 
 
-    public AutoTurretShooter(HardwareMap hardwareMap) {
+    public AutoTurret(HardwareMap hardwareMap) {
         gateServo = hardwareMap.get(Servo.class, "gateServo");
         hoodServo = hardwareMap.get(Servo.class, "hoodServo");
         shooterMotor = hardwareMap.get(DcMotor.class, "shooterMotor");
@@ -44,13 +44,12 @@ public class AutoTurretShooter {
 
    
 
-    public void DriveToTarget(Pose2D targetPose, AngleUnit angleUnit) {
+    public void AlignToTarget(Pose2D targetPose, AngleUnit angleUnit) {
 
         // Implementation for driving to target
         Posed2D currentPose = getCurrentPose();
 
-        Trajectory currentTrajectory = drive.trajectoryBuiler(currentPose)
-        .splineTo(targetPose.vec(0))
+    
 
 
         double targetAngle = CalculateTargetAngle(targetX, targetY);
