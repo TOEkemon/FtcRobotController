@@ -46,6 +46,8 @@ public class driveToCoord extends LinearOpMode {
 
     private Servo turret;
 
+    private DcMotor launcher;
+
     private IMU imu;
 
     String telemetryMessage = "Enter Starting Heading:";
@@ -396,6 +398,7 @@ public class driveToCoord extends LinearOpMode {
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
         imu = hardwareMap.get(IMU.class, "imu");
         turret = hardwareMap.get(Servo.class, "turret");
+        launcher = hardwareMap.get(DcMotor.class, "flywheel");
 
         IMU.Parameters myIMUparameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(

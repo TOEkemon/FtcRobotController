@@ -22,6 +22,8 @@ public class bioTeleOp extends LinearOpMode {
 
     private DcMotor intakemotor;
 
+    private DcMotor launcher;
+
 
 
 
@@ -32,8 +34,10 @@ public class bioTeleOp extends LinearOpMode {
         BR = hardwareMap.get(DcMotor.class, "drive_back_right");
         FL = hardwareMap.get(DcMotor.class, "drive_front_left");
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
-        intakemotor = hardwareMap.get(DcMotor.class, "intake");
+        //intakemotor = hardwareMap.get(DcMotor.class, "intake");
         turret = hardwareMap.get(Servo.class, "turret");
+        launcher = hardwareMap.get(DcMotor.class, "flywheel" );
+
 
 
 
@@ -71,23 +75,32 @@ public class bioTeleOp extends LinearOpMode {
                 BL.setPower(backLeftPow);
                 BR.setPower(backRightPow);
 
-                if (gamepad1.right_trigger_pressed) {
+                /*
+                if (gamepad1.rightTriggerWasPressed()) {
                     intakemotor.setPower(-1);
                 }
-                if (!gamepad1.right_trigger_pressed) {
+                if (gamepad1.rightTriggerWasReleased()) {
                     intakemotor.setPower(0);
                 }
-                if (gamepad1.left_trigger_pressed) {
+                if (gamepad1.leftTriggerWasPressed()) {
                     intakemotor.setPower(1);
                 }
-                if (!gamepad1.left_trigger_pressed) {
+                if (!gamepad1.leftTriggerWasReleased()) {
                     intakemotor.setPower(0);
                 }
+                */
+
                 if (gamepad1.dpadLeftWasPressed()) {
                 turret.setPosition(currentTurret + .05);
                 }
                 if (gamepad1.dpadRightWasPressed()) {
                 turret.setPosition(currentTurret - .05);
+                }
+                if (gamepad1.rightBumperWasPressed()) {
+                    launcher.setPower(1);
+                }
+                if (gamepad1.rightBumperWasReleased()) {
+                    launcher.setPower(0);
                 }
             }
         }
