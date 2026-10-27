@@ -83,12 +83,12 @@ public class bioTeleOp extends LinearOpMode {
                 if (!gamepad1.left_trigger_pressed) {
                     intakemotor.setPower(0);
                 }
-                //if (gamepad1.dpadLeftWasPressed()) {
-                //turret.setPosition(currentTurret + .05);
-                //}
-                //if (gamepad1.dpadRightWasPressed()) {
-                //turret.setPosition(currentTurret - .05);
-                //}
+                if (gamepad1.dpadLeftWasPressed()) {
+                turret.setPosition(currentTurret + .05);
+                }
+                if (gamepad1.dpadRightWasPressed()) {
+                turret.setPosition(currentTurret - .05);
+                }
             }
         }
     }
