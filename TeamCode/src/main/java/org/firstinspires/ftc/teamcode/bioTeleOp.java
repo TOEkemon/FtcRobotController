@@ -24,6 +24,13 @@ public class bioTeleOp extends LinearOpMode {
 
     private DcMotor launcher;
 
+    //for stopping motor seamlessly
+    double flywheelStart = 0;
+    double flywheelEnd = 0;
+    String runtimeMessage = flywheelStart + ", " + flywheelEnd;
+
+
+
 
 
 
@@ -55,6 +62,8 @@ public class bioTeleOp extends LinearOpMode {
                 //for turret
                 double currentTurret = 0;
 
+
+
                 double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
                 double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
                 double rx = gamepad1.right_stick_x;
@@ -79,15 +88,14 @@ public class bioTeleOp extends LinearOpMode {
                 if (gamepad1.rightTriggerWasPressed()) {
                     intakemotor.setPower(-1);
                 }
-                if (gamepad1.rightTriggerWasReleased()) {
-                    intakemotor.setPower(0);
-                }
                 if (gamepad1.leftTriggerWasPressed()) {
                     intakemotor.setPower(1);
                 }
-                if (!gamepad1.leftTriggerWasReleased()) {
+                if (gamepad1.rightTriggerWasReleased() || gamepad1.leftTriggerWasReleased()) {
                     intakemotor.setPower(0);
                 }
+
+
                 */
 
                 if (gamepad1.dpadLeftWasPressed()) {
@@ -97,11 +105,25 @@ public class bioTeleOp extends LinearOpMode {
                 turret.setPosition(currentTurret - .05);
                 }
                 if (gamepad1.rightBumperWasPressed()) {
-                    launcher.setPower(1);
+                    launcher.setPower(.49);
+                    flywheelStart = getRuntime();
                 }
                 if (gamepad1.rightBumperWasReleased()) {
                     launcher.setPower(0);
+                    flywheelEnd = getRuntime();
                 }
+                if (gamepad1.leftBumperWasPressed()) {
+                    launcher.setPower(-1 *(flywheelEnd-flywheelStart));
+                }
+                if (gamepad1.leftBumperWasReleased()) {
+                    launcher.setPower(0);
+                }
+                telemetry.addData("runtime 1 & 2", runtimeMessage); //for some rason this doesn't update
+                telemetry.addData("sysRuntime", getRuntime());
+                telemetry.update();
+
+
+
             }
         }
     }
