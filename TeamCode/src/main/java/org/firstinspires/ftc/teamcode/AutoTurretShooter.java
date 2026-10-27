@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+/*
+    package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -39,21 +40,21 @@ public class AutoTurretShooter {
         gateServo.setPosition(GATE_SERVO_CLOSED_POSITION);
         hoodServo.setPosition(HOOD_SERVO_UP_POSITION);
 
-    
+
     }
 
-   
+
 
     public void AlignToTarget(Pose2D targetPose, AngleUnit angleUnit) {
 
         // Implementation for driving to target
         Posed2D currentPose = getCurrentPose();
 
-    
+
 
 
         double targetAngle = CalculateTargetAngle(targetX, targetY);
-        
+
 
     }
 
@@ -62,16 +63,18 @@ public class AutoTurretShooter {
         gateToAngleUnit(angleUnit);
 
 
-        
+
     }
 
     public void setHoodServoPosition(double position, AngleUnit angleUnit) {
 
         hoodServos.setHoodServoPosition(position);
         HoodToAngleUnit(angleUnit);
-     
-       
+
+
     }
 
 
 }
+
+ */

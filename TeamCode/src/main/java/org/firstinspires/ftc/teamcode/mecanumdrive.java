@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+/*
+    package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -27,7 +28,7 @@ public class MecanumDrive {
     private double BackLeftPower;
 
     private double RevOrientation;
-    
+
     public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
     public static double KA = 0;
     public static double KStatic = 0;
@@ -39,7 +40,7 @@ public class MecanumDrive {
     public static final double MinPower = 0;
     public static final double MaxPower = 0;
 
-    public static final double TICK_PER_INCH = 
+    public static final double TICK_PER_INCH =
 
     public static final double MAX_RPM = 1;
 
@@ -49,15 +50,15 @@ public class MecanumDrive {
     public static double MIN_VEL =
 
     public static double TURN_SPEED = 0.80;
-   
+
 
     public static PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(0, 0, 0,
            getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV));
-    
-    
 
-  
-    
+
+
+
+
 public init(HardwareMap hwMap) {
     // initialize the variables
    FrontLeftMotor = hwMap.get(DcMotor.class, "front_left_motors");
@@ -76,17 +77,17 @@ public init(HardwareMap hwMap) {
    FrontRightMotor.setMode(RunMode.RUN_USING_ENCODER);
    BackRightMotor.setMode(RunMode.RUN_USING_ENCODER);
    BackRightMotor.setMode(RunMode.RUN_USING_ENCODER);
-   
 
-   
+
+
    IMU imu = hwMap.get(IMU.class, "imu");
 
    RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
     RevHubOrientationOnRobot.LogoFacingDirection.UP,
     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
 
-                                        
- 
+
+
  imu.initialize(new IMU.Parameters(RevOrientation);
 
 
@@ -104,24 +105,24 @@ public void Drive(double Left_Y, double Left_X, double Right_X, double Current_S
     BackLeftPower = forward - strafe + turn;
     BackRightPower = forward + strafe - turn;
 
-    
+
 
 }
 
 
 public void scaleMotorPower() {
-    
+
 
     if (Math.abs( FrontLeftPower) > MaxPower) {
         MaxPower = FrontLeftPower;
 
     }
-    
+
     if (Math.abs( FrontRightPower) > MaxPower) {
         MaxPower = FrontRightPower;
-    
+
     }
-    
+
     if (Math.abs(BackRightPower) > MaxPower) {
         MaxPower = BackRightPower;
     }
@@ -197,3 +198,5 @@ w
 
 
 
+
+ */

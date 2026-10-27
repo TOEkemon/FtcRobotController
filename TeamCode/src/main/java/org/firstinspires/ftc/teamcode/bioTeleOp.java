@@ -33,7 +33,7 @@ public class bioTeleOp extends LinearOpMode {
         FL = hardwareMap.get(DcMotor.class, "drive_front_left");
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
-        //turret = hardwareMap.get(Servo.class, "turret");
+        turret = hardwareMap.get(Servo.class, "turret");
 
 
 

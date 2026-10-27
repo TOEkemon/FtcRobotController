@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 //TICKS PER INCH = 752
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
 //system for driving to coordinates
 
 //this may go in the main autonomous file due to its amount of interactions with the hardware
@@ -21,25 +19,20 @@ needs to be inputted at the beginning of the round so the robot knows where it's
 Remember that ccw rotation increases yaw
  */
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static java.lang.Math.abs;
 import static java.lang.Math.atan;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 
-import android.media.Image;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @Autonomous(name="driveToCoord")
 public class driveToCoord extends LinearOpMode {
 
@@ -76,6 +69,10 @@ public class driveToCoord extends LinearOpMode {
 
     //relative to field, not robot (that is yaw)
     double currentFieldHeading = yaw + startingHeading;
+
+    int ticksAtStart = 0;
+
+
 
 
     //the heading (yaw) angle at which the robot is pointed toward's the field's North
@@ -140,12 +137,13 @@ public class driveToCoord extends LinearOpMode {
         double newY = currentYf + distanceTraveledf * sin(currentFieldHeading);
         currentCoordinates[0] = newX;
         currentCoordinates[1] = newY;
-        return currentCoordinates;
+        return currentCoordinates; //if we need currentcoordinates in a later line we will do currentCoordinates[0] and [1]
     }
 
     //moves robot to specificed coords
     public void driveToCoords(double currentX, double currentY, double goalX,
                              double goalY) {
+        ticksAtStart = (BL.getCurrentPosition() + FL.getCurrentPosition() + FR.getCurrentPosition()+ BR.getCurrentPosition())/4;
 
         robotOrientation = imu.getRobotYawPitchRollAngles();
         //may need to be a different measure b/c control hub is not deafult oriented, but may be fine b/c initialized with orientation
@@ -351,7 +349,7 @@ public class driveToCoord extends LinearOpMode {
 
         //calculate average so that it does each motor the right amount.
         //ticks dont scale at the same speed because to go soem diretions, it doesnt go forward, it actually goes backwards.
-        double tickAverage = (BL.getCurrentPosition() + BR.getCurrentPosition()+ FR.getCurrentPosition()+ FL.getCurrentPosition()) / 4;
+        tickAverage = (BL.getCurrentPosition() + BR.getCurrentPosition()+ FR.getCurrentPosition()+ FL.getCurrentPosition()) / 4;
         double rawTickDistance = (hypotenuse / 2.5) * ticksPerInch; //2.5 = 360/144, so its inches * ticksPerInch
         double targetTicks = tickAverage + rawTickDistance;
         //checks if goal has been met
@@ -381,6 +379,9 @@ public class driveToCoord extends LinearOpMode {
 
 
     }
+    public double getTicks(double currentTicksf, double startingTicksf) {
+        return currentTicksf - startingTicksf;
+    }
 
 
 
@@ -394,7 +395,7 @@ public class driveToCoord extends LinearOpMode {
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
         imu = hardwareMap.get(IMU.class, "imu");
-        //turret = hardwareMap.get(Servo.class, "turret");
+        turret = hardwareMap.get(Servo.class, "turret");
 
         IMU.Parameters myIMUparameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
@@ -452,7 +453,7 @@ public class driveToCoord extends LinearOpMode {
                 //update all variables
                 robotOrientation = imu.getRobotYawPitchRollAngles();
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
-                currentFieldHeading = yaw+startingHeading;
+                currentFieldHeading = yaw + startingHeading;
 
                 //april tag & camera method
                 telemetry.addData("xyz: ", robotOrientation);
