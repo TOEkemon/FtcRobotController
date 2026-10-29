@@ -163,13 +163,13 @@ public class driveToCoord extends LinearOpMode {
             currentFieldHeading = yaw + startingHeading;
             //UPDATE currentFieldHeading AT END OF METHOD
             //error margin
-            if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
-                FL.setPower(0);
-                BR.setPower(0);
-                BL.setPower(0);
-                BR.setPower(0);
-            }
+
         }
+        //set to 0 after while
+        FL.setPower(0);
+        BR.setPower(0);
+        BL.setPower(0);
+        BR.setPower(0);
         //differnce between current and goal coords
         //may need to be absolute value so trig functions return positive value
         double distanceX = goalX - currentX;
@@ -197,12 +197,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
-                    FL.setPower(0);
-                    BR.setPower(0);
-                    BL.setPower(0);
-                    BR.setPower(0);
-                }
+
             }
 
         }
@@ -220,12 +215,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
-                    FL.setPower(0);
-                    BR.setPower(0);
-                    BL.setPower(0);
-                    BR.setPower(0);
-                }
+
             }
         }
         //quadrant 1
@@ -241,12 +231,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) >= 89 && reverseConvert(currentFieldHeading) <= 91) {
-                    FL.setPower(0);
-                    BR.setPower(0);
-                    BL.setPower(0);
-                    BR.setPower(0);
-                }
+
             }
         }
         //straight north
@@ -263,12 +248,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+11) {
-                    FL.setPower(0);
-                    BR.setPower(0);
-                    BL.setPower(0);
-                    BR.setPower(0);
-                }
+
             }
         }
         //straight east
@@ -284,12 +264,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+1) {
-                    FL.setPower(0);
-                    BR.setPower(0);
-                    BL.setPower(0);
-                    BR.setPower(0);
-                }
+
             }
         }
         //straight south
@@ -305,12 +280,7 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+1) {
-                    FL.setPower(0);
-                    BR.setPower(0);
-                    BL.setPower(0);
-                    BR.setPower(0);
-                }
+
             }
         }
         //straight west
@@ -326,28 +296,17 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
                 //UPDATE currentFieldHeading AT END OF METHOD
-                if (reverseConvert(currentFieldHeading) >= goalFieldHeading-1 && reverseConvert(currentFieldHeading) <= goalFieldHeading+1) {
-                    FL.setPower(0);
-                    BR.setPower(0);
-                    BL.setPower(0);
-                    BR.setPower(0);
-                }
+
             }
         }
+        //set to 0 after while loop ends
+        FL.setPower(0);
+        BR.setPower(0);
+        BL.setPower(0);
+        BR.setPower(0);
         // no movement has no condition, nothing will happen if distance variables are 0
 
-        //NOW WE NEED DISTANCE DRIVING FOR HYPOTENUSE. WE WILL DO THIS IN A PHYSICAL SPACE BECAUSE WE NEED TO CALCULATE TICKS PER INCH
 
-        /* We need to:
-
-        find hypotenuse with distanceX and Y (done at top of method)
-
-        convert hypotenuse length to inches: 360 imaginary units (i units) = 12 feet = 144 inches (done below)
-
-        convert inches to ticks (need a ratio for this) (ratio at top), needs verifiaction
-
-        run the motor(s) with encoder using ticks to achieve distance
-         */
 
         //calculate average so that it does each motor the right amount.
         //ticks dont scale at the same speed because to go soem diretions, it doesnt go forward, it actually goes backwards.
