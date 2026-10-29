@@ -410,7 +410,7 @@ public class driveToCoord extends LinearOpMode {
         }
 
         if (opModeIsActive()) {
-            driveToCoords(0, 0, 90, 90);
+            driveToCoords(0, 0, 0, 90);
             while (opModeIsActive()) {
                 //update all variables
                 robotOrientation = imu.getRobotYawPitchRollAngles();
