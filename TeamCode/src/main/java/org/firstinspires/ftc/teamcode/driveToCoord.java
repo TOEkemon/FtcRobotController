@@ -130,13 +130,16 @@ public class driveToCoord extends LinearOpMode {
     public double convertAngle(double yawf) {
         return yawf + 180;
     }
-    public double[] findLocation(double startingHeadingf, double currentXf, double currentYf,
-                                 double distanceTraveledf, double yawf) {
+    public double[] findLocation(double currentXf, double currentYf,
+                                 double yawf) {
         //starting heading will probably be 90, 180 or 0
-        currentFieldHeading = yawf + startingHeadingf;
+        currentFieldHeading = yawf + startingHeading;
+        double oldTickAvg = tickAverage; //starting value for getting distance. This should be updated from the last time driveToCoords ran
+        tickAverage = (BL.getCurrentPosition() + FL.getCurrentPosition() + FR.getCurrentPosition() + BR.getCurrentPosition());
+        double distanceTraveled = getDistance(tickAverage, oldTickAvg);
         //go to mathisfun unit circle if confused
-        double newX = currentXf + distanceTraveledf * cos(currentFieldHeading);
-        double newY = currentYf + distanceTraveledf * sin(currentFieldHeading);
+        double newX = currentXf + distanceTraveled * cos(currentFieldHeading);
+        double newY = currentYf + distanceTraveled * sin(currentFieldHeading);
         currentCoordinates[0] = newX;
         currentCoordinates[1] = newY;
         return currentCoordinates; //if we need currentcoordinates in a later line we will do currentCoordinates[0] and [1]
@@ -329,19 +332,23 @@ public class driveToCoord extends LinearOpMode {
             FL.setPower(.1);
             BR.setPower(.1);
             FR.setPower(.1);
-            if (targetTicks > (tickAverage-2) && targetTicks < (tickAverage+2)) {
-                FR.setPower(0);
-                FL.setPower(0);
-                BR.setPower(0);
-                BL.setPower(0);
-            }
         }
+        //set to 0 after loop
+        FL.setPower(0);
+        BR.setPower(0);
+        BL.setPower(0);
+        BR.setPower(0);
+
+        currentCoordinates[0] = goalX;
+        currentCoordinates[1] = goalY;
 
 
 
     }
-    public double getTicks(double currentTicksf, double startingTicksf) {
-        return currentTicksf - startingTicksf;
+    public double getDistance(double currentTicksf, double startingTicksf) {
+        double currentDist = (currentTicksf/ticksPerInch * 2.5);
+        double startingDist = (startingTicksf/ticksPerInch) * 2.5;
+        return currentDist-startingDist;
     }
 
 
@@ -411,6 +418,7 @@ public class driveToCoord extends LinearOpMode {
 
         if (opModeIsActive()) {
             driveToCoords(0, 0, 0, 90);
+            driveToCoords(currentCoordinates[0], currentCoordinates[1], 0, 0);
             while (opModeIsActive()) {
                 //update all variables
                 robotOrientation = imu.getRobotYawPitchRollAngles();
