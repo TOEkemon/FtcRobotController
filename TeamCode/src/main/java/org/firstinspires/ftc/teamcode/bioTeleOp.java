@@ -118,9 +118,12 @@ public class bioTeleOp extends LinearOpMode {
                 if (gamepad1.leftBumperWasReleased()) {
                     launcher.setPower(0);
                 }
+                
+                // timing of the controls; seamless connection
                 telemetry.addData("runtime 1 & 2", runtimeMessage); //for some rason this doesn't update
                 telemetry.addData("sysRuntime", getRuntime());
                 telemetry.update();
+
 
 
 
