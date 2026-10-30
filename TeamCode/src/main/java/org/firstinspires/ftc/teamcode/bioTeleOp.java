@@ -8,6 +8,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.configuration.ServoFlavor;
+import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 
 
 @TeleOp(name="bioTeleOp")
@@ -18,16 +24,18 @@ public class bioTeleOp extends LinearOpMode {
     private DcMotor FL;
     private DcMotor FR;
 
-    private Servo turret;
+    private CRServo turret;
+
+
 
     private DcMotor intakemotor;
 
     private DcMotor launcher;
 
     //for stopping motor seamlessly
-    double flywheelStart = 0;
-    double flywheelEnd = 0;
-    String runtimeMessage = flywheelStart + ", " + flywheelEnd;
+
+
+
 
 
 
@@ -41,8 +49,9 @@ public class bioTeleOp extends LinearOpMode {
         BR = hardwareMap.get(DcMotor.class, "drive_back_right");
         FL = hardwareMap.get(DcMotor.class, "drive_front_left");
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
-        //intakemotor = hardwareMap.get(DcMotor.class, "intake");
-        turret = hardwareMap.get(Servo.class, "turret");
+        intakemotor = hardwareMap.get(DcMotor.class, "intake");
+        //CRservo fro continuous rotation
+        turret = hardwareMap.get(CRServo.class, "turret");
         launcher = hardwareMap.get(DcMotor.class, "flywheel" );
 
 
@@ -84,7 +93,7 @@ public class bioTeleOp extends LinearOpMode {
                 BL.setPower(backLeftPow);
                 BR.setPower(backRightPow);
 
-                /*
+
                 if (gamepad1.rightTriggerWasPressed()) {
                     intakemotor.setPower(-1);
                 }
@@ -96,32 +105,31 @@ public class bioTeleOp extends LinearOpMode {
                 }
 
 
-                */
+
 
                 if (gamepad1.dpadLeftWasPressed()) {
-                turret.setPosition(currentTurret + .05);
+                turret.setPower(currentTurret + .05);
                 }
                 if (gamepad1.dpadRightWasPressed()) {
-                turret.setPosition(currentTurret - .05);
+                turret.setPower(currentTurret - .05);
                 }
                 if (gamepad1.rightBumperWasPressed()) {
                     launcher.setPower(.49);
-                    flywheelStart = getRuntime();
+
                 }
                 if (gamepad1.rightBumperWasReleased()) {
                     launcher.setPower(0);
-                    flywheelEnd = getRuntime();
+
                 }
                 if (gamepad1.leftBumperWasPressed()) {
-                    launcher.setPower(-1 *(flywheelEnd-flywheelStart));
+                    launcher.setPower(launcher.getPower());
                 }
                 if (gamepad1.leftBumperWasReleased()) {
                     launcher.setPower(0);
                 }
                 
                 // timing of the controls; seamless connection
-                telemetry.addData("runtime 1 & 2", runtimeMessage); //for some rason this doesn't update
-                telemetry.addData("sysRuntime", getRuntime());
+                telemetry.addData("launcher", launcher.getPower());
                 telemetry.update();
 
 
