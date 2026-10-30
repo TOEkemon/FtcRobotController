@@ -32,6 +32,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 @Autonomous(name="driveToCoord")
 public class driveToCoord extends LinearOpMode {
@@ -44,7 +45,7 @@ public class driveToCoord extends LinearOpMode {
 
     private DcMotor intakemotor;
 
-    private Servo turret;
+    private CRServo turret;
 
     private DcMotor launcher;
 
@@ -363,7 +364,7 @@ public class driveToCoord extends LinearOpMode {
         FR = hardwareMap.get(DcMotor.class, "drive_front_right");
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
         imu = hardwareMap.get(IMU.class, "imu");
-        turret = hardwareMap.get(Servo.class, "turret");
+        turret = hardwareMap.get(CRServo.class, "turret");
         launcher = hardwareMap.get(DcMotor.class, "flywheel");
 
         IMU.Parameters myIMUparameters = new IMU.Parameters(
