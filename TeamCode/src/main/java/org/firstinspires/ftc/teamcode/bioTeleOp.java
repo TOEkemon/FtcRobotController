@@ -95,10 +95,10 @@ public class bioTeleOp extends LinearOpMode {
 
 
                 if (gamepad1.rightTriggerWasPressed()) {
-                    intakemotor.setPower(-1);
+                    intakemotor.setPower(1);
                 }
                 if (gamepad1.leftTriggerWasPressed()) {
-                    intakemotor.setPower(1);
+                    intakemotor.setPower(-1);
                 }
                 if (gamepad1.rightTriggerWasReleased() || gamepad1.leftTriggerWasReleased()) {
                     intakemotor.setPower(0);
