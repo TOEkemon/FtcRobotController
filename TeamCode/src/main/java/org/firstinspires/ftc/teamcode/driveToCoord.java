@@ -418,7 +418,7 @@ public class driveToCoord extends LinearOpMode {
         }
 
         if (opModeIsActive()) {
-            driveToCoords(0, 0, 0, 90);
+            driveToCoords(0, 0, 0, 40);
             driveToCoords(currentCoordinates[0], currentCoordinates[1], 0, 0);
             while (opModeIsActive()) {
                 //update all variables
