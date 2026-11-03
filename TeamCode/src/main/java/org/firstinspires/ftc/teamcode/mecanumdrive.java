@@ -87,8 +87,8 @@ public init(HardwareMap hwMap) {
     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
 
 
-
- imu.initialize(new IMU.Parameters(RevOrientation);
+    IMU.Parameters parameters = new IMU.Parameters;
+    imu.initialize(parameters);
 
 
 }
@@ -150,11 +150,10 @@ public void scalePower(double ScalePower) {
 
 
 
+double getYaw() {
+imu.getAngularOrientation.firstAngle;
 
-
-
-
-
+}
 
 
 
