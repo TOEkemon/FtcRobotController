@@ -66,7 +66,7 @@ public class driveToCoord extends LinearOpMode {
 
     int tickAverage;
 
-    double startingHeading; //use imu at init for this <- DO NOT I WAS DUMB
+    double startingHeading = 0; //there is currently no system for setting this. I don't know if imu can track yaw without being on
     //Starting heading and yaw will both be 0, this should be input by humans for the heading relative to field.
     //startingheading is like an offset, because if the robot starts pointed south then the yaw will be 0 even though
     //relative to field its 270
@@ -434,18 +434,22 @@ public class driveToCoord extends LinearOpMode {
         }
 
         if (opModeIsActive()) {
-            driveToCoords(0, 0, 0, 40);
-            driveToCoords(currentCoordinates[0], currentCoordinates[1], 0, 0);
             while (opModeIsActive()) {
                 //update all variables
+                driveToCoords(0, 0, 0, 40);
+                driveToCoords(currentCoordinates[0], currentCoordinates[1], 0, 0);
                 robotOrientation = imu.getRobotYawPitchRollAngles();
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
 
                 //april tag & camera method
+
+                //telemetry
                 telemetry.addData("xyz: ", robotOrientation);
+                telemetry.addData("usableYaw ", robotOrientation.getYaw());
                 telemetry.addData("averageTickCount: ", tickAverage);
                 telemetry.addData("goalFieldHeading ", goalHeading);
+                telemetry.addData("usable, ", reverseConvert(robotOrientation.getYaw()));
                 telemetry.addData("targetTicks ",  tickGoal);
                 telemetry.addData("tickAverage ", tickAverage);
                 telemetry.addData("ticksAtStart ", ticksAtStart);
