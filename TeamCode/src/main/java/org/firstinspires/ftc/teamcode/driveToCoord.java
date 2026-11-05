@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 //TICKS PER INCH = 752
@@ -384,6 +386,9 @@ public class driveToCoord extends LinearOpMode {
         FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        BL.setDirection(REVERSE);
+        FL.setDirection(REVERSE);
 
 
 
