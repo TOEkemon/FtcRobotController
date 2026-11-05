@@ -105,6 +105,14 @@ public void Drive(double Left_Y, double Left_X, double Right_X, double Current_S
     BackLeftPower = forward - strafe + turn;
     BackRightPower = forward + strafe - turn;
 
+    double maxPower = 1.0;
+    double maxSpeed = 1.0;
+
+    FrontLeftMotor.setPower(maxSpeed * (FrontLeftPower / maxPower);
+    FrontRightMotor.setPower(maxSpeed * (FrontRightPower / maxPower);
+    BackRightMotor.setPower(maxSpeed * (BackRightPower / maxPower);
+    BackLeftMotor.setPOwer(maxSpeed * (BackLeftPower / maxPower);
+
 
 
 }
@@ -133,7 +141,7 @@ public void scaleMotorPower() {
 
     if (MaxPower > 1) {
         scalePower(MaxPower);
-}
+    }
 
 
 }
@@ -149,11 +157,14 @@ public void scalePower(double ScalePower) {
 }
 
 
+public driveFieldRelative(double forward, double strafe, double turn) {
 
-double getYaw() {
-imu.getAngularOrientation.firstAngle;
+double theta = math.atan(forward, strafe);
+double r = Math.hypo(strafe, forward);
 
-}
+theta = AngleUnits.normalizeRadian(theta - imu.getYawPitchRollAngles().getYaw();
+
+
 
 
 
@@ -174,7 +185,7 @@ public void resetEncoders() {
 
 }
 
-w
+
 
 
 
