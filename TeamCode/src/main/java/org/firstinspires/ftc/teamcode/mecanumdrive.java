@@ -162,7 +162,7 @@ public driveFieldRelative(double forward, double strafe, double turn) {
 double theta = math.atan(forward, strafe);
 double r = Math.hypo(strafe, forward);
 
-theta = AngleUnits.normalizeRadian(theta - imu.getYawPitchRollAngles().getYaw();
+theta = AngleUnits.normalizeRadians(theta - imu.getYawPitchRollAngles().getYaw(AngleUnits.RADIANS);
 
 
 
