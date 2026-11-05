@@ -72,10 +72,14 @@ public class driveToCoord extends LinearOpMode {
     //relative to field its 270
     double yaw;
 
+    double goalHeading; //for telemtry
+
     //relative to field, not robot (that is yaw)
     double currentFieldHeading = yaw + startingHeading;
 
     int ticksAtStart = 0;
+
+    int tickGoal; //for telemetry
 
 
 
@@ -192,6 +196,7 @@ public class driveToCoord extends LinearOpMode {
         //quadrant 3 & 2 (negative output for 2, too small ouput for 3)
         if ((distanceX < 0 && distanceY > 0) || (distanceX < 0 && distanceY < 0)) { //left side of || is quadrant 2
             double goalFieldHeading = (atan(distanceY / distanceX)) + 180; //atan returns -value for q2 and ppsiitve for q3
+            goalHeading = goalFieldHeading;
             //rotates until achieves goal heading (margin of error maybe necessary
             while (reverseConvert(currentFieldHeading) != goalFieldHeading) {
                 BL.setPower(.2);
@@ -210,6 +215,7 @@ public class driveToCoord extends LinearOpMode {
         //quadrant 4
         else if (distanceX > 0 && distanceY < 0) {
             double goalFieldHeading = (atan(distanceY / distanceX)) + 360;
+            goalHeading = goalFieldHeading;
             //rotates until achieves goal heading (margin of error maybe necessary
             while (reverseConvert(currentFieldHeading) != goalFieldHeading) {
                 BL.setPower(.2);
@@ -227,6 +233,7 @@ public class driveToCoord extends LinearOpMode {
         //quadrant 1
         else if (distanceX > 0 && distanceY > 0) {
             double goalFieldHeading = atan(distanceY / distanceX);
+            goalHeading = goalFieldHeading;
             while (reverseConvert(currentFieldHeading) != goalFieldHeading) {
                 BL.setPower(.2);
                 FL.setPower(.2);
@@ -244,6 +251,7 @@ public class driveToCoord extends LinearOpMode {
         else if (distanceX == 0 && distanceY > 0) {
             double goalFieldHeading = 90; //North, robot should already be pointed there
             //rotate
+            goalHeading = goalFieldHeading;
             while (reverseConvert(currentFieldHeading) != goalFieldHeading) {
                 BL.setPower(.2);
                 FL.setPower(.2);
@@ -260,6 +268,7 @@ public class driveToCoord extends LinearOpMode {
         //straight east
         else if (distanceY == 0 && distanceX > 0) {
             double goalFieldHeading = 0;
+            goalHeading = goalFieldHeading;
             while (reverseConvert(currentFieldHeading) != goalFieldHeading) {
                 BL.setPower(.2);
                 FL.setPower(.2);
@@ -276,6 +285,7 @@ public class driveToCoord extends LinearOpMode {
         //straight south
         else if (distanceX == 0 && distanceY < 0) {
             double goalFieldHeading = 270;
+            goalHeading = goalFieldHeading;
             while (reverseConvert(currentFieldHeading) != goalFieldHeading) {
                 BL.setPower(.2);
                 FL.setPower(.2);
@@ -292,6 +302,7 @@ public class driveToCoord extends LinearOpMode {
         //straight west
         else if (distanceY == 0 && distanceX < 0) {
             double goalFieldHeading = 180;
+            goalHeading = goalFieldHeading;
             while (reverseConvert(currentFieldHeading) != goalFieldHeading) {
                 BL.setPower(.2);
                 FL.setPower(.2);
@@ -434,6 +445,10 @@ public class driveToCoord extends LinearOpMode {
                 //april tag & camera method
                 telemetry.addData("xyz: ", robotOrientation);
                 telemetry.addData("averageTickCount: ", tickAverage);
+                telemetry.addData("goalFieldHeading ", goalHeading);
+                telemetry.addData("targetTicks ",  tickGoal);
+                telemetry.addData("tickAverage ", tickAverage);
+                telemetry.addData("ticksAtStart ", ticksAtStart);
                 telemetry.update();
 
 
