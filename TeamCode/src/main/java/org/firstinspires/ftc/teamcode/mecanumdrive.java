@@ -1,6 +1,6 @@
 /*
     package org.firstinspires.ftc.teamcode.subsystems;
-
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -46,7 +46,8 @@ public class MecanumDrive {
 
     public static final double TICKS_PER_REV = 1;
 
-    public static double MAX_VEL = (Max rpm * gear ratio * wheel ratio * 2pi);
+    public static double MAX_VEL =
+        (MAX_RPM / 60.0) * GEAR_RATIO * WHEEL_RADIUS * 2.0 * Math.PI;
     public static double MIN_VEL =
 
     public static double TURN_SPEED = 0.80;
@@ -59,7 +60,7 @@ public class MecanumDrive {
 
 
 
-public init(HardwareMap hwMap) {
+public void init(HardwareMap hwMap) {
     // initialize the variables
    FrontLeftMotor = hwMap.get(DcMotor.class, "front_left_motors");
    FrontRightMotor = hwMap.get(DcMotor.class, "front_right_motors");
@@ -76,19 +77,20 @@ public init(HardwareMap hwMap) {
    FrontLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
    FrontRightMotor.setMode(RunMode.RUN_USING_ENCODER);
    BackRightMotor.setMode(RunMode.RUN_USING_ENCODER);
-   BackRightMotor.setMode(RunMode.RUN_USING_ENCODER);
+   BackLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
 
 
 
-   IMU imu = hwMap.get(IMU.class, "imu");
-
+   this.imu = hwMap.get(IMU.class, "imu");
    RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
     RevHubOrientationOnRobot.LogoFacingDirection.UP,
     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
 
 
-    IMU.Parameters parameters = new IMU.Parameters;
-    imu.initialize(parameters);
+    IMU.Parameters parameters =
+        new IMU.Parameters(revHubOrientationOnRobot);
+
+   imu.initialize(parameters);
 
 
 }
@@ -152,24 +154,21 @@ public void scalePower(double ScalePower) {
     FrontRightPower = FrontRightPower / ScalePower;
     FrontLeftPower = FrontLeftPower / ScalePower;
     BackLeftPower = BackLeftPower / ScalePower;
-    BackRightPower = BackLeftPower / ScalePower;
+    BackRightPower = BackRightPower / ScalePower;
 
 }
 
 
 public driveFieldRelative(double forward, double strafe, double turn) {
 
-double theta = math.atan(forward, strafe);
-double r = Math.hypo(strafe, forward);
+double theta = Math.atan2(forward, strafe);
+double r = Math.hypot(strafe, forward);
 
-theta = AngleUnits.normalizeRadians(theta - imu.getYawPitchRollAngles().getYaw(AngleUnits.RADIANS);
+theta = AngleUnit.normalizeRadians(
+        theta - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)
+);
 
-
-
-
-
-
-
+}
 
 
 
