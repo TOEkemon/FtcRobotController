@@ -70,6 +70,7 @@ public class driveToCoord extends LinearOpMode {
     //Starting heading and yaw will both be 0, this should be input by humans for the heading relative to field.
     //startingheading is like an offset, because if the robot starts pointed south then the yaw will be 0 even though
     //relative to field its 270
+    //it should be on yaw scale (-180 to 180) instead of practical scale (0 to 360)
     double yaw;
 
     double goalHeading; //for telemtry
