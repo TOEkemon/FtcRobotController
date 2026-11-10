@@ -443,6 +443,8 @@ public class driveToCoord extends LinearOpMode {
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
 
+                //we will probably want to go 24 inches (60 coordinates) to the left of where we start to end in the loading zone.
+
                 //april tag & camera method
 
                 //telemetry
