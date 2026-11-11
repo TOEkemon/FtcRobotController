@@ -2,11 +2,9 @@
     package org.firstinspires.ftc.teamcode.subsystems;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -27,24 +25,13 @@ public class MecanumDrive {
     private double BackRightPower;
     private double BackLeftPower;
 
-    private double RevOrientation;
-
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
-    public static double KA = 0;
-    public static double KStatic = 0;
-
-    public static double WHEEL_RADIUS = 2;
-    public static double GEAR_RATIO =
-    public static double TRACK_WIDTH =
+    private double orientation;
 
     public static final double MinPower = 0;
     public static final double MaxPower = 0;
 
     public static final double TICK_PER_INCH =
 
-    public static final double MAX_RPM = 1;
-
-    public static final double TICKS_PER_REV = 1;
 
     public static double MAX_VEL =
         (MAX_RPM / 60.0) * GEAR_RATIO * WHEEL_RADIUS * 2.0 * Math.PI;
@@ -86,11 +73,7 @@ public void init(HardwareMap hwMap) {
     RevHubOrientationOnRobot.LogoFacingDirection.UP,
     RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
 
-
-    IMU.Parameters parameters =
-        new IMU.Parameters(revHubOrientationOnRobot);
-
-   imu.initialize(parameters);
+   imu.initialize( new IMU.Parameter(orientation));
 
 
 }
@@ -98,22 +81,37 @@ public void init(HardwareMap hwMap) {
 
 public void Drive(double Left_Y, double Left_X, double Right_X, double Current_Speed) {
 
-    double forward = Left_Y * Current_Speed;
-    double turn = Right_X * (1.0 - forward) * TURN_SPEED;
-    double strafe = Left_X * Current_Speed;
+
+   if (!Double.isFinite(Left_Y)
+            || !Double.isFinite(Left_X)
+            || !Double.isFinite(Right_X)) {
+        throw new IllegalArgumentException(
+                "Drive inputs must be finite."
+        );
+    }
+
+   if (!(Current_Speed >= 0.0 && Current_Speed <= 1.0)) {
+        throw new IllegalArgumentException(
+                "Current_Speed must be between 0 and 1."
+        );
+    }
+
+    double forward = Left_Y;
+    double turn = Left_X;
+    double strafe = Right_X * Current_Speed;
 
     FrontLeftPower = forward + strafe + turn;
     FrontRightPower = forward - strafe - turn;
     BackLeftPower = forward - strafe + turn;
     BackRightPower = forward + strafe - turn;
 
-    double maxPower = 1.0;
-    double maxSpeed = 1.0;
 
-    FrontLeftMotor.setPower(maxSpeed * (FrontLeftPower / maxPower);
-    FrontRightMotor.setPower(maxSpeed * (FrontRightPower / maxPower);
-    BackRightMotor.setPower(maxSpeed * (BackRightPower / maxPower);
-    BackLeftMotor.setPOwer(maxSpeed * (BackLeftPower / maxPower);
+    scaleMotorPower();
+
+    FrontLeftMotor.setPower(FrontLeftPower * Current_Speed);
+    FrontRightMotor.setPower(FrontRightPower * Current_Speed);
+    BackRightMotor.setPower(BackRightPower * Current_Speed);
+    BackLeftMotor.setPower(BackLeftPower * Current_Speed);
 
 
 
@@ -121,42 +119,35 @@ public void Drive(double Left_Y, double Left_X, double Right_X, double Current_S
 
 
 public void scaleMotorPower() {
+    double maxPower = 1.0;
 
+    maxPower = Math.max(maxPower, Math.abs(FrontLeftPower));
+    maxPower = Math.max(maxPower, Math.abs(FrontRightPower));
+    maxPower = Math.max(maxPower, Math.abs(BackLeftPower));
+    maxPower = Math.max(maxPower, Math.abs(BackRightPower));
 
-    if (Math.abs( FrontLeftPower) > MaxPower) {
-        MaxPower = FrontLeftPower;
-
+    if (!Double.isFinite(maxPower)) {
+        throw new IllegalArgumentException(
+                "Calculated wheel powers must be finite."
+        );
     }
 
-    if (Math.abs( FrontRightPower) > MaxPower) {
-        MaxPower = FrontRightPower;
-
-    }
-
-    if (Math.abs(BackRightPower) > MaxPower) {
-        MaxPower = BackRightPower;
-    }
-
-    if (Math.abs(BackLeftPower) > MaxPower) {
-        MaxPower = BackLeftPower;
-    }
-
-    if (MaxPower > 1) {
-        scalePower(MaxPower);
-    }
-
-
+    scalePower(maxPower);
 }
 
 public void scalePower(double ScalePower) {
+    if (!Double.isFinite(ScalePower) || ScalePower < 1.0) {
+        throw new IllegalArgumentException(
+                "The normalization divisor must be finite and at least 1."
+        );
+    }
 
-
-    FrontRightPower = FrontRightPower / ScalePower;
     FrontLeftPower = FrontLeftPower / ScalePower;
+    FrontRightPower = FrontRightPower / ScalePower;
     BackLeftPower = BackLeftPower / ScalePower;
     BackRightPower = BackRightPower / ScalePower;
-
 }
+
 
 
 public driveFieldRelative(double forward, double strafe, double turn) {
@@ -164,34 +155,35 @@ public driveFieldRelative(double forward, double strafe, double turn) {
 double theta = Math.atan2(forward, strafe);
 double r = Math.hypot(strafe, forward);
 
-theta = AngleUnit.normalizeRadians(
-        theta - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)
-);
+double heading = imu.getRobotYawPitchRollAngles()
+            .getYaw(AngleUnit.RADIANS);
+            
+theta = AngleUnit.normalizeRadians(theta - heading);
+
+double robotForward = r * Math.sin(theta);
+double robotStrafe = r * Math.cos(theta);
+
+    Drive(robotForward, robotStrafe, turn, 1.0);
 
 }
 
 
 
 public void resetEncoders() {
+   drive(0,0,0);
 
     FrontLeftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
     FrontRightMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
     BackLeftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
     BackRightMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
+    
+    FrontLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
+    FrontRightMotor.setMode(RunMode.RUN_USING_ENCODER);
+    BackLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
+    BackRightMotor.setMode(RunMode.RUN_USING_ENCODER);
 
 
 }
-
-}
-
-
-
-
-
-
-
-
-
 
 
 
