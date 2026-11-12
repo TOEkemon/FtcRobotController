@@ -12,9 +12,7 @@ import org.firstinspires.ftc.robotcore.external.naviagation.Pose2D;
 
 
 
-@Autonomous
-(name = "AutoTurret", group ="automonous")
-public class AutoTurretShooter {
+public class ShooterSubsystem extends  {
 
     private Servo gateServo, hoodServo;;
     private DcMotor shooterMotor;
