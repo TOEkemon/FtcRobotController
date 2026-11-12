@@ -54,18 +54,8 @@ public class MecanumDrive {
     public static final double MinPower = 0;
     public static final double MaxPower = 0;
 
-    public static final double TICK_PER_INCH =
-
-
-    public static double MAX_VEL =
-        (MAX_RPM / 60.0) * GEAR_RATIO * WHEEL_RADIUS * 2.0 * Math.PI;
-    public static double MIN_VEL =
-
     public static double TURN_SPEED = 0.80;
 
-
-    public static PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(0, 0, 0,
-           getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV));
 
 
 
