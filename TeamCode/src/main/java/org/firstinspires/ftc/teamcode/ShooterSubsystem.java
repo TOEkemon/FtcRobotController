@@ -43,16 +43,12 @@ public class ShooterSubsystem extends  {
 
         velocityPIDfController = new PIDFController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD, ShooterConstants.kF);
         velocityPIDFController.setTolerance(100);
-
         
-
-
     }
 
-
-
-
-    }
+    public onInit() {
+    shooterMotor.setPower(0.0);
+    hoodServo.setPosition();
 
 
 
