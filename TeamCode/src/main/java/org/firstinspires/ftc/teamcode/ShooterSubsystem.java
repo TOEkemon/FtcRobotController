@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.naviagation.Pose2D;
 
 public class ShooterSubsystem extends  {
 
-    private Servo gateServo, hoodServo;;
+    private Servo hoodServo;;
     private DcMotorEx shooterMotor;
     private PIDFController velocityPIDfController;
     public static double  GATE_SERVO_CLOSED_POSITION = 0.0;
@@ -54,9 +54,6 @@ public class ShooterSubsystem extends  {
 
     }
 
-    public void setGateServoPosition(double position, AngleUnit angleUnit) {
-        gateServo.setPosition(position);
-        gateToAngleUnit(angleUnit);
 
 
 
