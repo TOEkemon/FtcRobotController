@@ -64,6 +64,10 @@ public class ShooterSubsystem extends  {
 
     }
 
+
+    public void setVelocityPoint(double target_Position) {
+    }
+
     public double get HoodServoPosition() {
        return hoodServo.getPosition();
 
