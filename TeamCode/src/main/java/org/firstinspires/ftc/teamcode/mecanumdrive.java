@@ -3,6 +3,7 @@
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
@@ -16,7 +17,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class MecanumDrive {
 
-    private DcMotor FrontLeftMotor, FrontRightMotor, BackLeftMotor, BackRightMotor;
+    private DcMotorEx FrontLeftMotor, FrontRightMotor, BackLeftMotor, BackRightMotor;
 
     private IMU imu;
 
@@ -49,10 +50,10 @@ public class MecanumDrive {
 
 public void init(HardwareMap hwMap) {
     // initialize the variables
-   FrontLeftMotor = hwMap.get(DcMotor.class, "front_left_motors");
-   FrontRightMotor = hwMap.get(DcMotor.class, "front_right_motors");
-   BackLeftMotor = hwMap.get(DcMotor.class, "back_left_motor");
-   BackRightMotor = hwMap.get(DcMotor.class, "back_right_motor");
+   FrontLeftMotor = hwMap.get(DcMotorEx.class, "FLM");
+   FrontRightMotor = hwMap.get(DcMotorEx.class, "FRM");
+   BackLeftMotor = hwMap.get(DcMotorEx.class, "BLM");
+   BackRightMotor = hwMap.get(DcMotorEx.class, "BRM");
 
 
    BackRightMotor.setDirection(Direction.REVERSE);
