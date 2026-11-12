@@ -163,6 +163,7 @@ public class driveToCoord extends LinearOpMode {
         yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
         //while loop rotates robot until its pointed north (90 degrees)
         //margin of error may be necessary
+        currentFieldHeading = yaw + startingHeading;
         while (reverseConvert(currentFieldHeading) != 90) {
             BL.setPower(.2);
             FL.setPower(.2);
@@ -404,7 +405,7 @@ public class driveToCoord extends LinearOpMode {
 
 
 
-        while (opModeInInit()) {
+        //while (opModeInInit()) {
             //may need to loop to get starting heading, but this is a good start
             //this probably isnt allowed by rules
             /*
@@ -432,12 +433,14 @@ public class driveToCoord extends LinearOpMode {
 
              */
 
-        }
-
+        //}
+        waitForStart();
         if (opModeIsActive()) {
+            currentCoordinates[0] = 360; ///where we plan to start. We are in the middle of the right side,
+            currentCoordinates[1] = 180; ///https://ftc-resources.firstinspires.org/ftc/game/manual p. 65
             while (opModeIsActive()) {
                 //update all variables
-                driveToCoords(0, 0, 0, 40);
+                driveToCoords(360, 180, 360, 40);
                 driveToCoords(currentCoordinates[0], currentCoordinates[1], 0, 0);
                 robotOrientation = imu.getRobotYawPitchRollAngles();
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
