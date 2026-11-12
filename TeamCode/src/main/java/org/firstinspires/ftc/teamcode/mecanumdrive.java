@@ -9,7 +9,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
+import com.acmerobotics.roadrunner.MecanumKinematics;
+import com.acmerobotics.roadrunner.MotorFeedforward;
 
 public class MecanumDrive {
 
@@ -32,6 +33,11 @@ public class MecanumDrive {
     }
 
     public Params PARAMs = new Params();
+
+    public MecanumKinematics kinematics = new MecanumKinematics(
+            PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
+
+            
    
 
     private DcMotorEx FrontLeftMotor, FrontRightMotor, BackLeftMotor, BackRightMotor;
