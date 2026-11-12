@@ -15,5 +15,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'org.ftclib.ftclib:core:2.1.1'
     implementation 'org.ftclib.ftclib:vision:2.1.0' // Optional for vision
+    implementation "com.acmerobotics.roadrunner:ftc:0.1.25"
+   implementation "com.acmerobotics.roadrunner:core:1.0.1"
+   implementation "com.acmerobotics.roadrunner:actions:1.0.1"
+   implementation "com.acmerobotics.dashboard:dashboard:0.5.1"
 }
 

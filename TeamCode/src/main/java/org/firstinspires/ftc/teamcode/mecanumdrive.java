@@ -1,5 +1,5 @@
 /*
-    package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,11 +11,28 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
-
-@TeleOp
-(name = "MecanumDrive")
-
 public class MecanumDrive {
+
+   public static class Params {
+   
+   RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
+    RevHubOrientationOnRobot.LogoFacingDirection.UP,
+    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
+
+    public double InPerTicks = 1;
+    public double LateralPerTicks = InPerTicks;
+    public double WidthInTracks = 0;
+
+    public double kA = 0;
+    public double kS = 0;
+    public double kV = 0;
+
+    
+    
+    }
+
+    public Params PARAMs = new Params();
+   
 
     private DcMotorEx FrontLeftMotor, FrontRightMotor, BackLeftMotor, BackRightMotor;
 
@@ -70,9 +87,7 @@ public void init(HardwareMap hwMap) {
 
 
    this.imu = hwMap.get(IMU.class, "imu");
-   RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
-    RevHubOrientationOnRobot.LogoFacingDirection.UP,
-    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
+   
 
    imu.initialize( new IMU.Parameter(orientation));
 
