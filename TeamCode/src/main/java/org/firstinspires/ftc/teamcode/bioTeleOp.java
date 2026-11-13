@@ -6,6 +6,7 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -19,18 +20,18 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 @TeleOp(name="bioTeleOp")
 public class bioTeleOp extends LinearOpMode {
 
-    private DcMotor BL;
-    private DcMotor BR;
-    private DcMotor FL;
-    private DcMotor FR;
+    private DcMotorEx BL;
+    private DcMotorEx BR;
+    private DcMotorEx FL;
+    private DcMotorEx FR;
 
     private CRServo turret;
 
 
 
-    private DcMotor intakemotor;
+    private DcMotorEx intakemotor;
 
-    private DcMotor launcher;
+    private DcMotorEx launcher;
 
     //for stopping motor seamlessly
 
