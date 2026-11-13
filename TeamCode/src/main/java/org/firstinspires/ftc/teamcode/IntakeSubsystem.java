@@ -20,7 +20,7 @@ public init(HardwareMap HwMap) {
   rearIntakeMotor = HwMap.get(DcMotorEx.class, "RI");
 
   frontIntakeMotor.setDirection(DcMotorSimpleDirection.REVERSE);
-  rearIntakeMotor.setDirection(DcMotorSimpleDirection.Reverse);
+  rearIntakeMotor.setDirection(DcMotorSimpleDirection.REVERSE);
   
 
   }
