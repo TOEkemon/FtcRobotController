@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
-public class FlywheelTeleOp extends LinearOpMode {
+public class DumbFlywheelTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Declare our motors
@@ -18,13 +21,19 @@ public class FlywheelTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("drive_back_left");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("drive_front_right");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("drive_back_right");
+        Servo turretServo = hardwareMap.servo.get("turret");
 
-        DcMotor intakeMotor = hardwareMap.dcMotor.get("flywheel");
+        DcMotorEx flywheelMotor = (DcMotorEx) hardwareMap.dcMotor.get("flywheel");
+        flywheelMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        DcMotorEx intakeMotor = (DcMotorEx) hardwareMap.dcMotor.get("intake");
+        DcMotorEx rampMotor = (DcMotorEx) hardwareMap.dcMotor.get("ramp");
+        rampMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
         // See the note about this earlier on this page.
+        // we need to do the Left motors :)
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -75,7 +84,19 @@ public class FlywheelTeleOp extends LinearOpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
 
-            intakeMotor.setPower((gamepad1.left_trigger - gamepad1.right_trigger) * 0.5);
+            var power = gamepad2.left_trigger - gamepad2.right_trigger;
+            if (gamepad2.a) intakeMotor.setPower(power);
+            if (gamepad2.b) rampMotor.setPower(power);
+            if (gamepad2.x) flywheelMotor.setPower(power * 0.5);
+            turretServo.setPosition((-gamepad2.left_stick_x + 1) / 2);
+
+            /*
+            double targetRpm = (gamepad1.left_trigger - gamepad1.right_trigger) * 4000;
+            intakeMotor.setVelocity(targetRpm * 6, AngleUnit.DEGREES);
+            telemetry.addLine("ehgwfuh");
+            telemetry.addData("Target RPM:", targetRpm);
+            telemetry.addData("Actual RPM:", intakeMotor.getVelocity());
+             */
         }
     }
 }
