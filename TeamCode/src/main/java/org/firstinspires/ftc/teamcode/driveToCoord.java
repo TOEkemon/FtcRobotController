@@ -35,21 +35,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @Autonomous(name="driveToCoord")
 public class driveToCoord extends LinearOpMode {
 
     //this is filled in from teleOp
-    private DcMotor BL;
-    private DcMotor BR;
-    private DcMotor FL;
-    private DcMotor FR;
+    private DcMotorEx BL;
+    private DcMotorEx BR;
+    private DcMotorEx FL;
+    private DcMotorEx FR;
 
-    private DcMotor intakemotor;
+    private DcMotorEx intakemotor;
 
     private CRServo turret;
 
-    private DcMotor launcher;
+    private DcMotorEx launcher;
 
     private IMU imu;
 
@@ -373,14 +374,14 @@ public class driveToCoord extends LinearOpMode {
     public void runOpMode() {
 
 
-        BL = hardwareMap.get(DcMotor.class, "drive_back_left");
-        BR = hardwareMap.get(DcMotor.class, "drive_back_right");
-        FL = hardwareMap.get(DcMotor.class, "drive_front_left");
-        FR = hardwareMap.get(DcMotor.class, "drive_front_right");
-        intakemotor = hardwareMap.get(DcMotor.class, "intake");
+        BL = hardwareMap.get(DcMotorEx.class, "drive_back_left");
+        BR = hardwareMap.get(DcMotorEx.class, "drive_back_right");
+        FL = hardwareMap.get(DcMotorEx.class, "drive_front_left");
+        FR = hardwareMap.get(DcMotorEx.class, "drive_front_right");
+        intakemotor = hardwareMap.get(DcMotorEx.class, "intake");
         imu = hardwareMap.get(IMU.class, "imu");
         turret = hardwareMap.get(CRServo.class, "turret");
-        launcher = hardwareMap.get(DcMotor.class, "flywheel");
+        launcher = hardwareMap.get(DcMotorEx.class, "flywheel");
 
         IMU.Parameters myIMUparameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
