@@ -97,6 +97,11 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
             telemetry.addData("Target RPM:", targetRpm);
             telemetry.addData("Actual RPM:", intakeMotor.getVelocity());
              */
+            if (gamepad1.rightBumperWasPressed()) { //stop everything
+                flywheelMotor.setPower(0);
+                intakeMotor.setPower(0);
+                rampMotor.setPower(0);
+            }
         }
     }
 }
