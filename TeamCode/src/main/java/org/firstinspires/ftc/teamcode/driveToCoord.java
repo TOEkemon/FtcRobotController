@@ -446,7 +446,7 @@ public class driveToCoord extends LinearOpMode {
             while (opModeIsActive()) {
                 //update all variables
                 while (!drivenToGoal) {
-                    driveToCoords(360, 180, 360, 40);
+                    driveToCoords(360, 180, 360, 150);
                 }
 
                 robotOrientation = imu.getRobotYawPitchRollAngles();
