@@ -57,10 +57,10 @@ public class dumbAuto extends LinearOpMode {
             while (opModeIsActive()) {
 
 
-                BL.setTargetPosition(13536); //1.5 feet
-                FL.setTargetPosition(13536);
-                BR.setTargetPosition(13536);
-                FR.setTargetPosition(13536);
+                BL.setTargetPosition(300); //short distance for 1 point
+                FL.setTargetPosition(300);
+                BR.setTargetPosition(300);
+                FR.setTargetPosition(300);
 
                 BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -71,6 +71,12 @@ public class dumbAuto extends LinearOpMode {
                 FL.setPower(1);
                 FR.setPower(1);
                 BR.setPower(1);
+
+                telemetry.addData("BL", BL.getCurrentPosition());
+                telemetry.addData("FL", FL.getCurrentPosition());
+                telemetry.addData("FR", FR.getCurrentPosition());
+                telemetry.addData("BR", BR.getCurrentPosition());
+                telemetry.update();
 
 
             }
