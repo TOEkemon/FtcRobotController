@@ -47,6 +47,9 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
+        double startTime = getRuntime();
+
+
         waitForStart();
 
         if (isStopRequested()) return;
@@ -90,6 +93,7 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
             if (gamepad2.a) intakeMotor.setPower(power);
             if (gamepad2.b) rampMotor.setPower(power);
             if (gamepad2.x) flywheelMotor.setPower(power * 0.5);
+
 
             turretServo.setPower(-gamepad2.left_stick_x);
 
