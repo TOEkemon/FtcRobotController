@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -21,7 +22,7 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("drive_back_left");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("drive_front_right");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("drive_back_right");
-        Servo turretServo = hardwareMap.servo.get("turret");
+        CRServo turretServo = hardwareMap.crservo.get("turret");
 
         DcMotorEx flywheelMotor = (DcMotorEx) hardwareMap.dcMotor.get("flywheel");
         flywheelMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -89,7 +90,8 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
             if (gamepad2.a) intakeMotor.setPower(power);
             if (gamepad2.b) rampMotor.setPower(power);
             if (gamepad2.x) flywheelMotor.setPower(power * 0.5);
-            turretServo.setPosition((-gamepad2.left_stick_x));
+
+            turretServo.setPower(-gamepad2.left_stick_x);
 
 
             /*
