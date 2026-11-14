@@ -156,6 +156,24 @@
             />
     </Camera> -->
 
+    <Camera vid="Logitech" pid="0x0825">
+        <Calibration
+            size="1280 720"
+            focalLength="1348.0f, 1308.0f"
+            principalPoint="470.4f, 370.8f"
+            distortionCoefficients="0.094891, -0.131564, -0.002297, -0.049707, 0.213568, 0, 0, 0"
+        />
+    </Camera>
+
+    <Camera vid="Logitech" pid="0x0825">
+        <Calibration
+            size="640 480"
+            focalLength="940.4f, 937.8f"
+            principalPoint="354.5f, 255.5f"
+            distortionCoefficients="0.039655, 0.809308, -0.000655, 0.012834, -3.578346, 0, 0, 0"
+        />
+    </Camera>
+
     <!-- ======================================================================================= -->
 
 </Calibrations>
