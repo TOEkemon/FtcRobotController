@@ -69,7 +69,8 @@ public class driveToCoord extends LinearOpMode {
 
     int tickAverage;
 
-    double startingHeading = 0; //there is currently no system for setting this. I don't know if imu can track yaw without being on
+    double startingHeading = 90; //this isn yaw range (180 to -180)
+    //there is currently no system for setting this. I don't know if imu can track yaw without being on
     //Starting heading and yaw will both be 0, this should be input by humans for the heading relative to field.
     //startingheading is like an offset, because if the robot starts pointed south then the yaw will be 0 even though
     //relative to field its 270
@@ -135,7 +136,14 @@ public class driveToCoord extends LinearOpMode {
     //we use one that goes from 0 to 360 ccw. yaw is 180 to -180 ccw
 
     public double reverseConvert(double practicalAngle){
-        return practicalAngle - 180;
+        double returnDouble = 0;
+        if (practicalAngle >= -90 && practicalAngle <= 180) {
+            returnDouble = practicalAngle + 90;
+        }
+        else if (practicalAngle < -90 && practicalAngle >= -180) {
+            returnDouble = practicalAngle + 450;
+        }
+        return returnDouble;
     }
     //reverse. converts yaw values into practical, usable values.
     public double convertAngle(double yawf) {
