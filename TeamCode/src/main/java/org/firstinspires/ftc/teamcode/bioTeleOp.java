@@ -25,7 +25,7 @@ public class bioTeleOp extends LinearOpMode {
     private DcMotorEx FL;
     private DcMotorEx FR;
 
-    private CRServo turret;
+    private Servo turret;
 
 
 
@@ -46,14 +46,14 @@ public class bioTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        BL = hardwareMap.get(DcMotor.class, "drive_back_left");
-        BR = hardwareMap.get(DcMotor.class, "drive_back_right");
-        FL = hardwareMap.get(DcMotor.class, "drive_front_left");
-        FR = hardwareMap.get(DcMotor.class, "drive_front_right");
-        intakemotor = hardwareMap.get(DcMotor.class, "intake");
+        BL = hardwareMap.get(DcMotorEx.class, "drive_back_left");
+        BR = hardwareMap.get(DcMotorEx.class, "drive_back_right");
+        FL = hardwareMap.get(DcMotorEx.class, "drive_front_left");
+        FR = hardwareMap.get(DcMotorEx.class, "drive_front_right");
+        intakemotor = hardwareMap.get(DcMotorEx.class, "intake");
         //CRservo fro continuous rotation
-        turret = hardwareMap.get(CRServo.class, "turret");
-        launcher = hardwareMap.get(DcMotor.class, "flywheel" );
+        turret = hardwareMap.get(Servo.class, "turret");
+        launcher = hardwareMap.get(DcMotorEx.class, "flywheel" );
 
 
 
@@ -109,14 +109,16 @@ public class bioTeleOp extends LinearOpMode {
 
 
                 if (gamepad1.dpadLeftWasPressed()) {
-                turret.setPower(1);
+                turret.setPosition(currentTurret + .05);
+                currentTurret += .05;
                 }
                 if (gamepad1.dpadRightWasPressed()) {
-                turret.setPower(-1);
+                turret.setPosition(currentTurret - .05);
+                currentTurret -= .05;
                 }
-                if (gamepad1.dpadLeftWasReleased() || gamepad1.dpadRightWasReleased()) {
-                    turret.setPower(0);
-                }
+                //if (gamepad1.dpadLeftWasReleased() || gamepad1.dpadRightWasReleased()) {
+                //    turret.setPower(0);
+                //}
 
                 if (gamepad1.rightBumperWasPressed()) {
                     launcher.setPower(-.49);
