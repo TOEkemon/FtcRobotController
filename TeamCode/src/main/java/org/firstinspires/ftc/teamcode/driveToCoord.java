@@ -56,6 +56,8 @@ public class driveToCoord extends LinearOpMode {
 
     String telemetryMessage = "Enter Starting Heading:";
 
+    boolean drivenToGoal = false;
+
     //dimensions are 360*360, actual is 12*12ft on real field
     final int fieldX = 360;
     final int fieldY = 360;
@@ -359,6 +361,8 @@ public class driveToCoord extends LinearOpMode {
         currentCoordinates[0] = goalX;
         currentCoordinates[1] = goalY;
 
+        drivenToGoal = true;
+
 
 
     }
@@ -441,8 +445,10 @@ public class driveToCoord extends LinearOpMode {
             currentCoordinates[1] = 180; ///https://ftc-resources.firstinspires.org/ftc/game/manual p. 65
             while (opModeIsActive()) {
                 //update all variables
-                driveToCoords(360, 180, 360, 40);
-                driveToCoords(currentCoordinates[0], currentCoordinates[1], 0, 0);
+                while (!drivenToGoal) {
+                    driveToCoords(360, 180, 360, 150);
+                }
+
                 robotOrientation = imu.getRobotYawPitchRollAngles();
                 yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
                 currentFieldHeading = yaw + startingHeading;
