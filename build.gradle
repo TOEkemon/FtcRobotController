@@ -31,3 +31,9 @@ allprojects {
 repositories {
     mavenCentral()
 }
+
+
+dependencies {
+    // ... existing dependencies ...
+    implementation 'com.acmerobotics.roadrunner:core:1.0.1'
+}
