@@ -1,4 +1,4 @@
-/*
+
     package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,8 +21,6 @@ public class ShooterSubsystem extends  {
     private Servo hoodServo;;
     private DcMotorEx shooterMotor;
     private PIDFController velocityPIDfController;
-    public static double  GATE_SERVO_CLOSED_POSITION = 0.0;
-    public static double GATE_SERVO_OPEN_POSITION = 0.0;
     public static double HOOD_SERVO_UP_POSITION = 0.0;
     public static double HOOD_SERVO_DOWN_POSITION = 0.0;
 
@@ -47,7 +45,7 @@ public class ShooterSubsystem extends  {
         
     }
 
-    public onInit() {
+    public void onInit() {
     shooterMotor.setPower(0.0);
     hoodServo.setPosition();
 
