@@ -5,10 +5,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.library.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.arcrobotics.ftclib.command.SubystemBase;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 
 
-public IntakeSubystem {
+public IntakeSubystem extend SubsystemBase {
 
   private DcMotorEx frontIntakeMotor, rearIntakeMotor;
 
