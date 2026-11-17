@@ -1,5 +1,4 @@
-
-    package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -44,6 +43,12 @@ public class ShooterSubsystem extends  {
         velocityPIDFController.setTolerance(100);
         
     }
+     public pose getTargetPose() {
+
+         
+     }    
+
+    
 
     public void onInit() {
     shooterMotor.setPower(0.0);
@@ -69,6 +74,6 @@ public class ShooterSubsystem extends  {
     public double get HoodServoPosition() {
        return hoodServo.getPosition();
 
-}
+    }
 
- */
+    public double getCurrentShooterPower(double) {
