@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.configuration.ServoFlavor;
 import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
-import org.firstinspires.ftc.teamcode.MenacumDrive.java;
+
 
 @TeleOp(name="bioTeleOp")
 public class bioTeleOp extends LinearOpMode {
@@ -32,7 +32,6 @@ public class bioTeleOp extends LinearOpMode {
     private DcMotorEx intakemotor;
 
     private DcMotorEx launcher;
-    
 
     //for stopping motor seamlessly
 
@@ -46,8 +45,6 @@ public class bioTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        MenacumDrive drive = new MecanumDrive();
-        drive.init(hardwareMap, new Pose2d(0,0,0));
 
         BL = hardwareMap.get(DcMotorEx.class, "drive_back_left");
         BR = hardwareMap.get(DcMotorEx.class, "drive_back_right");
@@ -91,15 +88,6 @@ public class bioTeleOp extends LinearOpMode {
                 double backLeftPow = (y - x + rx) / denominator;
                 double frontRightPow = (y - x - rx) / denominator;
                 double backRightPow = (y + x - rx) / denominator;
-
-                drive.localizer.update();
-                double speed = gamepad1.right_bumper ? 0.5 : 1.0;
-                drive.driveFlieldRelative(-gamepad1.lift_stick-y, -gaamepad1.lift_stick_x, -gamepad1.right_stick_x);
-
-                Pose2d p = drive.localizer.getPose();
-                telemetry.addData("x", p.position.x);
-                telemetry.addData("y", p.position.y);
-                telemetry.addData("heading (deg)", Math.toDegrees(p.heading.toDouble()));
 
                 FL.setPower(frontLeftPow);
                 FR.setPower(frontRightPow);
