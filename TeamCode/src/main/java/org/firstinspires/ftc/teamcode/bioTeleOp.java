@@ -129,12 +129,12 @@ public class bioTeleOp extends LinearOpMode {
                     launcher.setPower(0);
 
                 }
-                if (gamepad1.leftBumperWasPressed()) {
-                    launcher.setPower(launcher.getPower());
-                }
-                if (gamepad1.leftBumperWasReleased()) {
-                    launcher.setPower(0);
-                }
+                //if (gamepad1.leftBumperWasPressed()) {
+                    //launcher.setPower(launcher.getPower());
+                //}
+                //if (gamepad1.leftBumperWasReleased()) {
+                    //launcher.setPower(0);
+                //}
                 if (gamepad1.aWasPressed()) {
                     ramp.setPower(1);
                 }
