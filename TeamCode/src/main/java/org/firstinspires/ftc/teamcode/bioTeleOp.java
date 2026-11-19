@@ -138,7 +138,7 @@ public class bioTeleOp extends LinearOpMode {
                 if (gamepad1.aWasPressed()) {
                     ramp.setPower(1);
                 }
-                if (gamepad1.backWasPressed()) {
+                if (gamepad1.bWasPressed()) {
                     ramp.setPower(-1);
                 }
                 if (gamepad1.aWasReleased() || gamepad1.backWasReleased()) {
@@ -146,7 +146,7 @@ public class bioTeleOp extends LinearOpMode {
                 }
                 
                 // timing of the controls; seamless connection
-                telemetry.addData("launcher", launcher.getPower());
+                telemetry.addData("launcher", power);
                 telemetry.update();
 
 

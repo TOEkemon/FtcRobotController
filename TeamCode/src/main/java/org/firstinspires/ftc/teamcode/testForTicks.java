@@ -42,6 +42,7 @@ public class testForTicks extends LinearOpMode {
         //BR.setDirection(REVERSE);
         //FR.setDirection(REVERSE);
 
+
         BL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         BL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         BR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -70,13 +71,13 @@ public class testForTicks extends LinearOpMode {
                 double frontRightPow = (y - x - rx) / denominator;
                 double backRightPow = (y + x - rx) / denominator;
 
-                if (gamepad1.aWasPressed()) {
+                if (gamepad1.xWasPressed()) {
                     FL.setPower(.2);
                     FR.setPower(.2);
                     BL.setPower(.2);
                     BR.setPower(.2);
                 }
-                if (gamepad1.aWasReleased()) {
+                if (gamepad1.xWasReleased()) {
                     FL.setPower(0);
                     FR.setPower(0);
                     BL.setPower(0);

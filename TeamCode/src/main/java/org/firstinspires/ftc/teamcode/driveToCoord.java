@@ -5,7 +5,7 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 ///TICKS PER INCH = 752 with dcmotor.
-///TICKS PER INCH =
+///TICKS PER INCH = 178 with dcmotorex
 
 //system for driving to coordinates
 
@@ -63,7 +63,7 @@ public class driveToCoord extends LinearOpMode {
     final int fieldX = 360;
     final int fieldY = 360;
 
-    final int ticksPerInch = 752; //guess
+    final double ticksPerInch = 41.79; //trials and calculation
 
     //not using tickoffse
     int ticksOffset = 0; //set this to the current tick position and subtract it later to get the ticks since the time you most recently changed it
