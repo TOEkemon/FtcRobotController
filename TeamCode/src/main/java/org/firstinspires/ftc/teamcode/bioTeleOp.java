@@ -24,6 +24,7 @@ public class bioTeleOp extends LinearOpMode {
     private DcMotorEx BR;
     private DcMotorEx FL;
     private DcMotorEx FR;
+    private DcMotorEx ramp;
 
     private Servo turret;
 
@@ -54,6 +55,7 @@ public class bioTeleOp extends LinearOpMode {
         //CRservo fro continuous rotation
         turret = hardwareMap.get(Servo.class, "turret");
         launcher = hardwareMap.get(DcMotorEx.class, "flywheel" );
+        ramp = hardwareMap.get(DcMotorEx.class, "ramp");
 
 
 
@@ -89,6 +91,8 @@ public class bioTeleOp extends LinearOpMode {
                 double frontRightPow = (y - x - rx) / denominator;
                 double backRightPow = (y + x - rx) / denominator;
 
+                double power = gamepad1.right_stick_y;
+
                 FL.setPower(frontLeftPow);
                 FR.setPower(frontRightPow);
                 BL.setPower(backLeftPow);
@@ -105,9 +109,6 @@ public class bioTeleOp extends LinearOpMode {
                     intakemotor.setPower(0);
                 }
 
-
-
-
                 if (gamepad1.dpadLeftWasPressed()) {
                 turret.setPosition(currentTurret + .05);
                 currentTurret += .05;
@@ -121,7 +122,7 @@ public class bioTeleOp extends LinearOpMode {
                 //}
 
                 if (gamepad1.rightBumperWasPressed()) {
-                    launcher.setPower(-.49);
+                    launcher.setPower(power);
 
                 }
                 if (gamepad1.rightBumperWasReleased()) {
@@ -133,6 +134,15 @@ public class bioTeleOp extends LinearOpMode {
                 }
                 if (gamepad1.leftBumperWasReleased()) {
                     launcher.setPower(0);
+                }
+                if (gamepad1.aWasPressed()) {
+                    ramp.setPower(1);
+                }
+                if (gamepad1.backWasPressed()) {
+                    ramp.setPower(-1);
+                }
+                if (gamepad1.aWasReleased() || gamepad1.backWasReleased()) {
+                    ramp.setPower(0);
                 }
                 
                 // timing of the controls; seamless connection
