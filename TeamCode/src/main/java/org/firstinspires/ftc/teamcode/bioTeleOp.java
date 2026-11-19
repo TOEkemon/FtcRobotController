@@ -141,7 +141,7 @@ public class bioTeleOp extends LinearOpMode {
                 if (gamepad1.bWasPressed()) {
                     ramp.setPower(-1);
                 }
-                if (gamepad1.aWasReleased() || gamepad1.backWasReleased()) {
+                if (gamepad1.aWasReleased() || gamepad1.bWasReleased()) {
                     ramp.setPower(0);
                 }
                 
