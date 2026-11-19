@@ -22,7 +22,7 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("drive_back_left");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("drive_front_right");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("drive_back_right");
-        CRServo turretServo = hardwareMap.crservo.get("turret");
+        Servo turretServo = hardwareMap.servo.get("turret");
 
         DcMotorEx flywheelMotor = (DcMotorEx) hardwareMap.dcMotor.get("flywheel");
         flywheelMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -58,6 +58,8 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
+
+            double currentTurret = 0; //current turret servo position.
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
@@ -95,7 +97,12 @@ public class DumbFlywheelTeleOp extends LinearOpMode {
             if (gamepad2.x) flywheelMotor.setPower(power * 0.5);
 
 
-            turretServo.setPower(-gamepad2.left_stick_x);
+            if (gamepad2.dpadLeftWasPressed()) {
+                turretServo.setPosition(currentTurret-.1);
+            }
+            if (gamepad2.dpadRightWasPressed()) {
+                turretServo.setPosition(currentTurret+.1);
+            }
 
 
             /*

@@ -6,15 +6,16 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
 @TeleOp(name="testForTicks")
 public class testForTicks extends LinearOpMode {
 
-    private DcMotor BL;
-    private DcMotor BR;
-    private DcMotor FL;
-    private DcMotor FR;
+    private DcMotorEx BL;
+    private DcMotorEx BR;
+    private DcMotorEx FL;
+    private DcMotorEx FR;
 
     int flpos;
     int frpos;
@@ -27,10 +28,10 @@ public class testForTicks extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        BL = hardwareMap.get(DcMotor.class, "drive_back_left");
-        BR = hardwareMap.get(DcMotor.class, "drive_back_right");
-        FL = hardwareMap.get(DcMotor.class, "drive_front_left");
-        FR = hardwareMap.get(DcMotor.class, "drive_front_right");
+        BL = hardwareMap.get(DcMotorEx.class, "drive_back_left");
+        BR = hardwareMap.get(DcMotorEx.class, "drive_back_right");
+        FL = hardwareMap.get(DcMotorEx.class, "drive_front_left");
+        FR = hardwareMap.get(DcMotorEx.class, "drive_front_right");
 
 
 
@@ -68,6 +69,19 @@ public class testForTicks extends LinearOpMode {
                 double backLeftPow = (y - x + rx) / denominator;
                 double frontRightPow = (y - x - rx) / denominator;
                 double backRightPow = (y + x - rx) / denominator;
+
+                if (gamepad1.aWasPressed()) {
+                    FL.setPower(.2);
+                    FR.setPower(.2);
+                    BL.setPower(.2);
+                    BR.setPower(.2);
+                }
+                if (gamepad1.aWasReleased()) {
+                    FL.setPower(0);
+                    FR.setPower(0);
+                    BL.setPower(0);
+                    BR.setPower(0);
+                }
 
                 FL.setPower(frontLeftPow / 4);
                 FR.setPower(frontRightPow / 4);
