@@ -1,215 +1,192 @@
-/*
-package org.firstinspires.ftc.teamcode;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+ package org.firstinspires.ftc.teamcode;
+
+import com.acmerobotics.roadrunner.DualNum;
+import com.acmerobotics.roadrunner.MecanumKinematics;
+import com.acmerobotics.roadrunner.MotorFeedforward;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.PoseVelocity2dDual;
+import com.acmerobotics.roadrunner.Rotation2d;
+import com.acmerobotics.roadrunner.Time;
+import com.acmerobotics.roadrunner.Twist2d;
+import com.acmerobotics.roadrunner.Twist2dDual;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Encoder;
+import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
+import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
+import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.acmerobotics.roadrunner.MecanumKinematics;
-import com.acmerobotics.roadrunner.MotorFeedforward;
-
-public class MecanumDrive {
-
-   public static class Params {
-   
-   RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
-    RevHubOrientationOnRobot.LogoFacingDirection.UP,
-    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
-
-    public double InPerTicks = 1;
-    public double LateralPerTicks = InPerTicks;
-    public double WidthInTracks = 0;
-
-    public double kA = 0;
-    public double kS = 0;
-    public double kV = 0;
-
-    
-    
-    }
-
-    public Params PARAMs = new Params();
-
-    public MecanumKinematics kinematics = new MecanumKinematics(
-            PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
-
-            
-   
-
-    private DcMotorEx FrontLeftMotor, FrontRightMotor, BackLeftMotor, BackRightMotor;
-
-    private IMU imu;
-
-    private double FrontLeftPower;
-    private double FrontRightPower;
-    private double BackRightPower;
-    private double BackLeftPower;
-
-    private double orientation;
-
-    public static final double MinPower = 0;
-    public static final double MaxPower = 0;
-
-    public static double TURN_SPEED = 0.80;
-
-
-
-
-
-
-public void init(HardwareMap hwMap) {
-    // initialize the variables
-   FrontLeftMotor = hwMap.get(DcMotorEx.class, "FL");
-   FrontRightMotor = hwMap.get(DcMotorEx.class, "FR");
-   BackLeftMotor = hwMap.get(DcMotorEx.class, "BL");
-   BackRightMotor = hwMap.get(DcMotorEx.class, "BR");
-
-
-   BackRightMotor.setDirection(SimpleMotor.Direction.REVERSE);
-   BackLeftMotor.setDirection(SimpleMotor.Direction.REVERSE);
-   FrontLeftMotor.setDirection(SimpleMotor.Direction.FORWARD);
-   FrontRightMotor.setDirection(SimpleMotor.Direction.FORWARD);
-
-
-   FrontLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
-   FrontRightMotor.setMode(RunMode.RUN_USING_ENCODER);
-   BackRightMotor.setMode(RunMode.RUN_USING_ENCODER);
-   BackLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
-
-
-
-   this.imu = hwMap.get(IMU.class, "imu");
-   
-
-   imu.initialize( new IMU.Parameter(orientation));
-
-
-}
-
-
-public void Drive(double Left_Y, double Left_X, double Right_X, double Current_Speed) {
-
-
-   if (!Double.isFinite(Left_Y)
-            || !Double.isFinite(Left_X)
-            || !Double.isFinite(Right_X)) {
-        throw new IllegalArgumentException(
-                "Drive inputs must be finite."
-        );
-    }
-
-   if (!(Current_Speed >= 0.0 && Current_Speed <= 1.0)) {
-        throw new IllegalArgumentException(
-                "Current_Speed must be between 0 and 1."
-        );
-    }
-
-    double forward = Left_Y;
-    double turn = Left_X;
-    double strafe = Right_X * Current_Speed;
-
-    FrontLeftPower = forward + strafe + turn;
-    FrontRightPower = forward - strafe - turn;
-    BackLeftPower = forward - strafe + turn;
-    BackRightPower = forward + strafe - turn;
-
-
-    scaleMotorPower();
-
-    FrontLeftMotor.setPower(FrontLeftPower * Current_Speed);
-    FrontRightMotor.setPower(FrontRightPower * Current_Speed);
-    BackRightMotor.setPower(BackRightPower * Current_Speed);
-    BackLeftMotor.setPower(BackLeftPower * Current_Speed);
-
-
-
-}
-
-
-public void scaleMotorPower() {
-    double maxPower = 1.0;
-
-    maxPower = Math.max(maxPower, Math.abs(FrontLeftPower));
-    maxPower = Math.max(maxPower, Math.abs(FrontRightPower));
-    maxPower = Math.max(maxPower, Math.abs(BackLeftPower));
-    maxPower = Math.max(maxPower, Math.abs(BackRightPower));
-
-    if (!Double.isFinite(maxPower)) {
-        throw new IllegalArgumentException(
-                "Calculated wheel powers must be finite."
-        );
-    }
-
-    scalePower(maxPower);
-}
-
-public void scalePower(double ScalePower) {
-    if (!Double.isFinite(ScalePower) || ScalePower < 1.0) {
-        throw new IllegalArgumentException(
-                "The normalization divisor must be finite and at least 1."
-        );
-    }
-
-    FrontLeftPower = FrontLeftPower / ScalePower;
-    FrontRightPower = FrontRightPower / ScalePower;
-    BackLeftPower = BackLeftPower / ScalePower;
-    BackRightPower = BackRightPower / ScalePower;
-}
-
-
-
-public driveFieldRelative(double forward, double strafe, double turn) {
-
-double theta = Math.atan2(forward, strafe);
-double r = Math.hypot(strafe, forward);
-
-double heading = imu.getRobotYawPitchRollAngles()
-            .getYaw(AngleUnit.RADIANS);
-            
-theta = AngleUnit.normalizeRadians(theta - heading);
-
-double robotForward = r * Math.sin(theta);
-double robotStrafe = r * Math.cos(theta);
-
-    Drive(robotForward, robotStrafe, turn, 1.0);
-
-}
-
-
-
-public void resetEncoders() {
-   drive(0,0,0);
-
-    FrontLeftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-    FrontRightMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-    BackLeftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-    BackRightMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-    
-    FrontLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
-    FrontRightMotor.setMode(RunMode.RUN_USING_ENCODER);
-    BackLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
-    BackRightMotor.setMode(RunMode.RUN_USING_ENCODER);
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
- */
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+  public class MecanumDrive {
+
+      public static class Params {
+          public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
+                  RevHubOrientationOnRobot.LogoFacingDirection.UP;
+          public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
+                  RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+
+          
+          public double inPerTick = 1;          // ForwardPushTest
+          public double lateralInPerTick = 1;   // LateralPushTest / LateralRampLogger
+          public double trackWidthTicks = 0;    
+
+          // Feedforward, in TICK units like the quickstart (ForwardRampLogger / ManualFeedforwardTuner)
+          public double kS = 0;
+          public double kV = 0;
+          public double kA = 0;
+      }
+
+      public static Params PARAMS = new Params();
+
+      public MecanumKinematics kinematics;
+      public MotorFeedforward feedforward;
+      public DriveLocalizer localizer;
+
+      public DcMotorEx leftFront, leftBack, rightBack, rightFront;
+      public IMU imu;
+      public VoltageSensor voltageSensor;
+
+      public void init(HardwareMap hwMap, Pose2d startPose) {
+          leftFront  = hwMap.get(DcMotorEx.class, "FL");
+          leftBack   = hwMap.get(DcMotorEx.class, "BL");
+          rightBack  = hwMap.get(DcMotorEx.class, "BR");
+          rightFront = hwMap.get(DcMotorEx.class, "FR");
+
+          // Typical mecanum: reverse the LEFT side. Verify on your robot.
+          leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+          leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+
+          for (DcMotorEx m : new DcMotorEx[]{leftFront, leftBack, rightBack, rightFront}) {
+              m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+              m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // feedforward does the velocity work
+          }
+
+          imu = hwMap.get(IMU.class, "imu");
+          imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
+                  PARAMS.logoFacingDirection, PARAMS.usbFacingDirection)));
+          imu.resetYaw();
+
+          voltageSensor = hwMap.voltageSensor.iterator().next();
+
+          // Built here (not as field initializers) so they use the current PARAMS values
+          kinematics = new MecanumKinematics(
+                  PARAMS.inPerTick * PARAMS.trackWidthTicks,
+                  PARAMS.inPerTick / PARAMS.lateralInPerTick);
+
+          feedforward = new MotorFeedforward(
+                  PARAMS.kS,
+                  PARAMS.kV / PARAMS.inPerTick,
+                  PARAMS.kA / PARAMS.inPerTick);
+
+          localizer = new DriveLocalizer(startPose);
+      }
+
+      /** TeleOp: normalized powers (-1..1). x = forward, y = LEFT, heading = CCW. */
+      public void setDrivePowers(PoseVelocity2d powers) {
+          // Track width 1 => same math as your manual mixing, just done by RR
+          MecanumKinematics.WheelVelocities<Time> w =
+                  new MecanumKinematics(1).inverse(PoseVelocity2dDual.constant(powers, 1));
+
+          double max = 1;
+          for (DualNum<Time> p : w.all()) max = Math.max(max, Math.abs(p.value()));
+
+          leftFront.setPower(w.leftFront.value() / max);
+          leftBack.setPower(w.leftBack.value() / max);
+          rightBack.setPower(w.rightBack.value() / max);
+          rightFront.setPower(w.rightFront.value() / max);
+      }
+
+      /** Field-centric TeleOp. Call localizer.update() every loop first. */
+      public void driveFieldRelative(double forward, double left, double turn) {
+          Rotation2d heading = localizer.getPose().heading;
+          Vector2d robotVec = heading.inverse().times(new Vector2d(forward, left));
+          setDrivePowers(new PoseVelocity2d(robotVec, turn));
+      }
+
+      /** Real units (in/s, rad/s) -> kinematics -> feedforward volts -> power. */
+      public void setDriveVelocity(PoseVelocity2d vel) {
+          MecanumKinematics.WheelVelocities<Time> w =
+                  kinematics.inverse(PoseVelocity2dDual.constant(vel, 2)); // 2 = vel + accel(0)
+
+          double voltage = voltageSensor.getVoltage();
+          leftFront.setPower(feedforward.compute(w.leftFront) / voltage);
+          leftBack.setPower(feedforward.compute(w.leftBack) / voltage);
+          rightBack.setPower(feedforward.compute(w.rightBack) / voltage);
+          rightFront.setPower(feedforward.compute(w.rightFront) / voltage);
+      }
+
+      public void stop() {
+          setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+      }
+
+      // ---------------- Drive-encoder + IMU localizer ----------------
+      public class DriveLocalizer {
+          public final Encoder leftFront, leftBack, rightBack, rightFront;
+
+          private int lastLF, lastLB, lastRB, lastRF;
+          private Rotation2d lastHeading;
+          private boolean initialized = false;
+          private Pose2d pose;
+
+          public DriveLocalizer(Pose2d startPose) {
+              leftFront  = new OverflowEncoder(new RawEncoder(MecanumDrive.this.leftFront));
+              leftBack   = new OverflowEncoder(new RawEncoder(MecanumDrive.this.leftBack));
+              rightBack  = new OverflowEncoder(new RawEncoder(MecanumDrive.this.rightBack));
+              rightFront = new OverflowEncoder(new RawEncoder(MecanumDrive.this.rightFront));
+
+              
+              leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+              leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+
+              pose = startPose;
+          }
+
+          public Pose2d getPose() { return pose; }
+          public void setPose(Pose2d p) { pose = p; }
+
+          /** Call once per loop. Returns robot velocity. */
+          public PoseVelocity2d update() {
+              PositionVelocityPair lf = leftFront.getPositionAndVelocity();
+              PositionVelocityPair lb = leftBack.getPositionAndVelocity();
+              PositionVelocityPair rb = rightBack.getPositionAndVelocity();
+              PositionVelocityPair rf = rightFront.getPositionAndVelocity();
+
+              Rotation2d heading = Rotation2d.exp(
+                      imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+
+              if (!initialized) {
+                  initialized = true;
+                  lastLF = lf.position; lastLB = lb.position;
+                  lastRB = rb.position; lastRF = rf.position;
+                  lastHeading = heading;
+                  return new PoseVelocity2d(new Vector2d(0, 0), 0);
+              }
+
+              double headingDelta = heading.minus(lastHeading);
+
+              Twist2dDual<Time> twist = kinematics.forward(new MecanumKinematics.WheelIncrements<>(
+                      new DualNum<Time>(new double[]{lf.position - lastLF, lf.velocity}).times(PARAMS.inPerTick),
+                      new DualNum<Time>(new double[]{lb.position - lastLB, lb.velocity}).times(PARAMS.inPerTick),
+                      new DualNum<Time>(new double[]{rb.position - lastRB, rb.velocity}).times(PARAMS.inPerTick),
+                      new DualNum<Time>(new double[]{rf.position - lastRF, rf.velocity}).times(PARAMS.inPerTick)
+              ));
+
+              lastLF = lf.position; lastLB = lb.position;
+              lastRB = rb.position; lastRF = rf.position;
+              lastHeading = heading;
+
+              // Wheels give x/y; IMU gives heading (much more accurate than wheel heading)
+              pose = pose.plus(new Twist2d(twist.line.value(), headingDelta));
+
+              return twist.velocity().value();
+          }
+      }
+  }
